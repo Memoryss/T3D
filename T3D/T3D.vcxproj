@@ -141,6 +141,9 @@
   <ItemGroup>
     <ClInclude Include="T3DMath.h" />
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="T3DMath.cpp" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
