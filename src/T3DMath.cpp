@@ -317,6 +317,54 @@ namespace T3D {
 		mprod.m_mat[1][1] = ma.m_mat[1][0] * mb.m_mat[0][1] + ma.m_mat[1][1] * mb.m_mat[1][1];
 	}
 
+	int CommonMath::Solve22System(const Matrix22 & A, Matrix12 & X, const Matrix12 & B)
+	{
+		float det_A = Mat22Det(A);
+
+		// test if det(a) is zero, if so then there is no solution
+		if (fabs(det_A) < EPSILON_E5)
+			return 1;
+
+		// step 2: create x,y numerator matrices by taking A and
+		// replacing each column of it with B(transpose) and solve
+		Matrix22 work_mat; // working matrix
+
+							// solve for x /////////////////
+
+							// copy A into working matrix
+		work_mat.InitWithMat22(A);
+
+		// swap out column 0 (x column)
+		//MAT_COLUMN_SWAP_2X2(&work_mat, 0, B);
+		work_mat.m_mat[0][0] = B.m_mat[0][0];
+		work_mat.m_mat[1][0] = B.m_mat[1][0];
+
+		// compute determinate of A with B swapped into x column
+		float det_ABx = Mat22Det(work_mat);
+
+		// now solve for X00
+		X.m_mat[0][0] = det_ABx / det_A;
+
+		// solve for y /////////////////
+
+		// copy A into working matrix
+		work_mat.InitWithMat22(A);
+
+		// swap out column 1 (y column)
+		//MAT_COLUMN_SWAP_2X2(&work_mat, 1, B);
+		work_mat.m_mat[0][1] = B.m_mat[0][1];
+		work_mat.m_mat[1][1] = B.m_mat[1][1];
+
+		// compute determinate of A with B swapped into y column
+		float det_ABy = Mat22Det(work_mat);
+
+		// now solve for X01
+		X.m_mat[0][1] = det_ABy / det_A;
+
+		// return success
+		return 0;
+	}
+
 	void CommonMath::Mat12MulMat32(const Matrix12 &ma, const Matrix32 &mb, Matrix12 &mprod)
 	{
 		mprod.m_mat[0][0] = ma.m_mat[0][0] * mb.m_mat[0][0] + ma.m_mat[0][1] * mb.m_mat[1][0] + 1 * mb.m_mat[2][0];
@@ -362,12 +410,12 @@ namespace T3D {
 
 	int CommonMath::Mat32Init(Matrix32 &ma, float m00, float m01, float m10, float m11, float m20, float m21)
 	{
-		m.m_mat[0][0] = m00;
-		m.m_mat[0][1] = m01;
-		m.m_mat[1][0] = m10;
-		m.m_mat[1][1] = m11;
-		m.m_mat[2][0] = m20;
-		m.m_mat[2][1] = m21;
+		ma.m_mat[0][0] = m00;
+		ma.m_mat[0][1] = m01;
+		ma.m_mat[1][0] = m10;
+		ma.m_mat[1][1] = m11;
+		ma.m_mat[2][0] = m20;
+		ma.m_mat[2][1] = m21;
 	}
 
 
@@ -436,6 +484,74 @@ namespace T3D {
 		mi.m_mat[1][2] = -det_inv*(m.m_mat[0][0] * m.m_mat[1][2] - m.m_mat[1][0] * m.m_mat[0][2]);
 		mi.m_mat[2][2] = det_inv*(m.m_mat[0][0] * m.m_mat[1][1] - m.m_mat[1][0] * m.m_mat[0][1]);
 
+		return 0;
+	}
+
+	int CommonMath::SolveMat33System(Matrix33 & A, Matrix13 & X, Matrix13 & B)
+	{
+		// step 1: compute determinate of A
+		float det_A = Mat33Det(A);
+
+		// test if det(a) is zero, if so then there is no solution
+		if (fabs(det_A) < EPSILON_E5)
+			return(0);
+
+		// step 2: create x,y,z numerator matrices by taking A and
+		// replacing each column of it with B(transpose) and solve
+		Matrix33 work_mat; // working matrix
+
+							// solve for x /////////////////
+
+							// copy A into working matrix
+		work_mat.InitWithMat33(A);
+
+		// swap out column 0 (x column)
+		//MAT_COLUMN_SWAP_3X3(&work_mat, 0, B);
+		work_mat.m_mat[0][0] = B.m_mat[0][0];
+		work_mat.m_mat[1][0] = B.m_mat[1][0];
+		work_mat.m_mat[2][0] = B.m_mat[2][0];
+
+		// compute determinate of A with B swapped into x column
+		float det_ABx = Mat33Det(work_mat);
+
+		// now solve for X00
+		X.m_mat[0][0] = det_ABx / det_A;
+
+		// solve for y /////////////////
+
+		// copy A into working matrix
+		work_mat.InitWithMat33(A);
+
+		// swap out column 1 (y column)
+		//MAT_COLUMN_SWAP_3X3(&work_mat, 1, B);
+		work_mat.m_mat[0][1] = B.m_mat[0][1];
+		work_mat.m_mat[1][1] = B.m_mat[1][1];
+		work_mat.m_mat[2][1] = B.m_mat[2][1];
+
+		// compute determinate of A with B swapped into y column
+		float det_ABy = Mat33Det(work_mat);
+
+		// now solve for X01
+		X.m_mat[0][1] = det_ABy / det_A;
+
+		// solve for z /////////////////
+
+		// copy A into working matrix
+		work_mat.InitWithMat33(A);
+
+		// swap out column 2 (z column)
+		//MAT_COLUMN_SWAP_3X3(&work_mat, 2, B);
+		work_mat.m_mat[0][2] = B.m_mat[0][2];
+		work_mat.m_mat[1][2] = B.m_mat[1][2];
+		work_mat.m_mat[2][2] = B.m_mat[2][2];
+
+		// compute determinate of A with B swapped into z column
+		float det_ABz = Mat33Det(work_mat);
+
+		// now solve for X02
+		X.m_mat[0][2] = det_ABz / det_A;
+
+		// return success
 		return 0;
 	}
 
@@ -714,7 +830,114 @@ namespace T3D {
 		//这个函数根据绕x, y, z的旋转的角度，创建一个的zyx顺序进行旋转的四元数 应该还有11个根据旋转角度创建四元数的函数
 
 		//预先计算一些值
-		float cos_z_z = 0.5 * cosf(theta_z);
+		float cos_z_2 = 0.5 * cosf(theta_z);
+		float cos_y_2 = 0.5 * cosf(theta_y);
+		float cos_x_2 = 0.5 * cosf(theta_x);
+
+		float sin_z_2 = 0.5 * sinf(theta_z);
+		float sin_y_2 = 0.5 * sinf(theta_y);
+		float sin_x_2 = 0.5 * sinf(theta_x); 
+
+		//计算四元数
+		q.m_q0 = cos_z_2 * cos_y_2 * cos_x_2 + sin_x_2 * sin_z_2 * sin_y_2;
+		q.m_qv.m_x = cos_z_2 * cos_y_2 * sin_x_2 - sin_z_2 * sin_x_2 * cos_x_2;
+		q.m_qv.m_y = cos_z_2 * sin_y_2 * cos_x_2 + sin_z_2 * cos_x_2 * sin_x_2;
+		q.m_qv.m_z = sin_z_2 * cos_y_2 * cos_x_2 + cos_z_2 * sin_y_2 * sin_x_2;
 	}
 
+	void CommonMath::QuatToV3DTheta(const Quat & q, Vector3D & v, float & theta)
+	{
+		//将一个单位四元数转化为一个单位方向向量和一个绕该向量旋转的角度
+
+		theta = acosf(q.m_q0);
+
+		float sinf_theta_inv = 1.0 / sinf(theta);
+		v.m_x = q.m_qv.m_x * sinf_theta_inv;
+		v.m_y = q.m_qv.m_y * sinf_theta_inv;
+		v.m_z = q.m_qv.m_z * sinf_theta_inv;
+
+		theta *= 2;
+	}
+
+	void CommonMath::QuatPrint(const Quat & q, char * name)
+	{
+		Log::WriteError("%s, w=%d, x=%d, y=%d, z=%d", name, q.m_q0, q.m_qv.m_x, q.m_qv.m_y, q.m_qv.m_z);
+	}
+
+	void CommonMath::QuatAdd(const Quat & q1, const Quat & q2, Quat & qsum)
+	{
+		qsum.m_q0 = q1.m_q0 + q2.m_q0;
+		Vector3DAdd(q1.m_qv, q2.m_qv, qsum.m_qv);
+	}
+	void CommonMath::QuatSub(const Quat & q1, const Quat & q2, Quat & qdiff)
+	{
+		qdiff.m_q0 = q1.m_q0 - q2.m_q0;
+		Vector3DSub(q1.m_qv, q2.m_qv, qdiff.m_qv);
+	}
+	void CommonMath::QuatConjugate(const Quat & q1, Quat & qconj)
+	{
+		qconj.m_q0 = q1.m_q0;
+		qconj.m_qv.m_x = q1.m_qv.m_x;
+		qconj.m_qv.m_y = q1.m_qv.m_y;
+		qconj.m_qv.m_z = q1.m_qv.m_z;
+	}
+	void CommonMath::QuatScale(const Quat & q, float scale, Quat & qs)
+	{
+		qs.m_q0 = q.m_q0 * scale;
+		qs.m_qv.InitWithVec3(qs.m_qv);
+		Vector3DScale(scale, qs.m_qv);
+	}
+	float CommonMath::QuatNorm(const Quat & q)
+	{
+		return sqrtf(q.m_q0 * q.m_q0 + q.m_qv.m_x * q.m_qv.m_x + q.m_qv.m_y * q.m_qv.m_y + q.m_qv.m_z * q.m_qv.m_z);
+	}
+	void CommonMath::QuatNormalize(const Quat & q, Quat & qn)
+	{
+		float qlength = QuatNorm(q);
+		qn.m_q0 = q.m_q0 / qlength;
+		qn.m_qv.m_x = q.m_qv.m_x / qlength;
+		qn.m_qv.m_y = q.m_qv.m_y / qlength;
+		qn.m_qv.m_z = q.m_qv.m_z / qlength;
+	}
+	void CommonMath::QuatUnitInverse(const Quat & q, Quat & qi)
+	{
+		qi.m_q0 = q.m_q0;
+		qi.m_qv.InitWithVec3(q.m_qv);
+		Vector3DScale(-1, qi.m_qv);
+	}
+	void CommonMath::QuatInverse(const Quat & q, Quat & qi)
+	{
+		float norm2_inv = 1.0 / (q.m_q0 * q.m_q0 + q.m_qv.m_x * q.m_qv.m_x + q.m_qv.m_y * q.m_qv.m_y + q.m_qv.m_z * q.m_qv.m_z);
+
+		qi.m_q0 = q.m_q0 * norm2_inv;
+		qi.m_qv.InitWithVec3(q.m_qv);
+		Vector3DScale(norm2_inv, qi.m_qv);
+	}
+	void CommonMath::QuatMul(const Quat & q1, const Quat & q2, Quat & qprod)
+	{
+		float prd_0 = (q1.m_qv.m_z - q1.m_qv.m_y) * (q2.m_qv.m_y - q2.m_qv.m_z);
+		float prd_1 = (q1.m_q0 + q1.m_qv.m_x) * (q2.m_q0 + q2.m_qv.m_x);
+		float prd_2 = (q1.m_q0 - q1.m_qv.m_x) * (q2.m_qv.m_y + q2.m_qv.m_z);
+		float prd_3 = (q1.m_qv.m_y + q1.m_qv.m_z) * (q2.m_q0 - q2.m_qv.m_x);
+		float prd_4 = (q1.m_qv.m_z - q1.m_qv.m_x) * (q2.m_qv.m_x - q2.m_qv.m_y);
+		float prd_5 = (q1.m_qv.m_z + q1.m_qv.m_x) * (q2.m_qv.m_x + q2.m_qv.m_y);
+		float prd_6 = (q1.m_q0 + q1.m_qv.m_y) * (q2.m_q0 - q2.m_qv.m_z);
+		float prd_7 = (q1.m_q0 - q1.m_qv.m_y) * (q2.m_q0 + q2.m_qv.m_z);
+
+		float prd_8 = prd_5 + prd_6 + prd_7;
+		float prd_9 = 0.5 * (prd_4 + prd_8);
+
+		// and finally build up the result with the temporary products
+
+		qprod.m_q0 = prd_0 + prd_9 - prd_5;
+		qprod.m_qv.m_x = prd_1 + prd_9 - prd_8;
+		qprod.m_qv.m_y = prd_2 + prd_9 - prd_7;
+		qprod.m_qv.m_z = prd_3 + prd_9 - prd_6;
+	}
+	void CommonMath::QuatTripleProduct(const Quat & q1, const Quat & q2, const Quat & q3, Quat & qprod)
+	{
+		Quat qtmp;
+		QuatMul(q1, q2, qtmp);
+		QuatMul(qtmp, q3, qprod);
+	}
 }

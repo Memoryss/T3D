@@ -93,7 +93,7 @@ namespace T3D {
 			m_w = 0;
 		}
 
-		void InitXYZW(float x, float, y, float z, float w) {
+		void InitXYZW(float x, float y, float z, float w) {
 			m_x = x;
 			m_y = y;
 			m_z = z;
@@ -192,7 +192,7 @@ namespace T3D {
 			memcpy((void*)m_mat, (void*)&IMAT33, sizeof(Matrix33));
 		}
 
-		void InitWithMat33(const Matrix22 &m33) {
+		void InitWithMat33(const Matrix33 &m33) {
 			memcpy((void*)m_mat, (void*)&m33, sizeof(Matrix33));
 		}
 
@@ -338,7 +338,7 @@ namespace T3D {
 		0, 0, 1
 	};
 
-	const Matrix22 IMAT22 = {
+	const struct Matrix22 IMAT22 = {
 		1, 0,
 		0, 1
 	};
@@ -424,7 +424,8 @@ namespace T3D {
 		static void Mat22Add(const Matrix22 &ma, const Matrix22 &mb, Matrix22 &msum);
 		static void Mat22Mul(const Matrix22 &ma, const Matrix22 &mb, Matrix22 &mprod);
 		static int Mat22Inverse(const Matrix22 &m, Matrix22 &mi);  //逆矩阵
-		static int Solve22System(const Matrix22 &A, const Matrix22 &X, const Matrix22 &B);
+		//计算2*2方程式
+		static int Solve22System(const Matrix22 &A, Matrix12 &X, const Matrix12 &B);
 		static void Mat12MulMat32(const Matrix12 &ma, const Matrix32 &mb, Matrix12 &mprod);  //matrix12最后一个使用1补上
 
 		//3*3矩阵
@@ -435,7 +436,8 @@ namespace T3D {
 		static void Vec3MulMat33(const Vector3D &va, const Matrix33 &mb, Vector3D &vprod);
 		static int Mat33Inverse(const Matrix33 &m, Matrix33 &mi);
 		static void Mat33Init(Matrix33 &m, float m00, float m01, float m02, float m10, float m11, float m12, float m20, float m21, float m22);
-		static int SolveMat33System(Matrix33 &A, Matrix33 &X, Matrix33 &B);
+		//计算2*2方程式
+		static int SolveMat33System(Matrix33 &A, Matrix13 &X, Matrix13 &B);
 		static void PrintMat33(const Matrix33 &ma, char *name);
 		static float Mat33Det(const Matrix33 &m);
 
@@ -454,9 +456,9 @@ namespace T3D {
 		//四元数函数
 		static void QuatAdd(const Quat &q1, const Quat &q2, Quat &qsum);
 		static void QuatSub(const Quat &q1, const Quat &q2, Quat &qdiff);
-		static void QuatConjugate(const Quat &q1, Quat &qconj);
+		static void QuatConjugate(const Quat &q1, Quat &qconj);  //计算共轭
 		static void QuatScale(const Quat &q, float scale, Quat &qs);
-		static void QuatNorm(Quat &q);
+		static float QuatNorm(const Quat &q);
 		static void QuatNormalize(const Quat &q, Quat &qn);
 		static void QuatUnitInverse(const Quat &q, Quat & qi);
 		static void QuatInverse(const Quat &q, Quat &qi);
@@ -464,6 +466,7 @@ namespace T3D {
 		static void QuatTripleProduct(const Quat &q1, const Quat &q2, const Quat &q3, Quat &qprod);
 		static void V3DThetaToQuat(Quat &q, const Vector3D &v, float theta);
 		static void V4DThetaToQuat(Quat &q, const Vector4D &v, float theta);
+		//根据绕z y x旋转的欧拉角创建一个旋转的四元数。
 		static void EulerZYXToQuat(Quat &q, float theta_z, float theta_y, float theta_x);
 		static void QuatToV3DTheta(const Quat &q, Vector3D &v, float &theta);
 		static void QuatPrint(const Quat &q, char *name);
