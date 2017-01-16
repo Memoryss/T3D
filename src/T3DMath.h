@@ -358,21 +358,26 @@ namespace T3D {
 	class CommonMath
 	{
 	public:
+		//common  
+		//先计算出0~360的sin和cos值保存起来
+		static void BuildSinCosTables();
+
 		//三角函数
-		static FastSin(float theta);
-		static FastCos(float theta);
+		//查表以及插值 快速计算
+		static float FastSin(float theta);
+		static float FastCos(float theta);
 
 		//距离
-		static int FastDistance2D(int x, int y);
-		static float FastDistance3D(float x, float, float z);
+		static float FastDistance2D(float x, float y);
+		static float FastDistance3D(float x, float y, float z);
 
 		//极坐标
 		static void Polar2DToPoint2D(const Polar2D &polar, Point2D &point);
 		static void Point2DToPolar2D(const Point2D &point, Polar2D &polar);
 		static void Cylindrical3DToPoint3D(const Cylindrical3D &c3d, Point3D &p3d);
-		static void Point3DToCylindrical(const Point3D &p3d, Cylindrical3D & 3d);
-		static void Spherical3DToPoint3D(const Spherical3D &s3d, Point3D & 3d);
-		static void Point3DToSpherical(cosnt Point3D & 3d, Spherical3D & 3d);
+		static void Point3DToCylindrical3D(const Point3D &p3d, Cylindrical3D &c3d);
+		static void Spherical3DToPoint3D(const Spherical3D &s3d, Point3D &p3d);
+		static void Point3DToSpherical3D(const Point3D &p3d, Spherical3D &s3d);
 
 		//2d向量函数
 		static void Vector2DAdd(const Vector2D &va, const Vector2D &vb, Vector2D& vsum);
@@ -382,8 +387,8 @@ namespace T3D {
 		static float Vector2DLength(const Vector2D &va);
 		static float Vector2DLengthFast(const Vector2D &va);
 		static void Vector2DNormalize(Vector2D &va);
-		static void Vector2DBuild(const Vector2D &va, Vector2D &vb);
-		static float Vector2DCosTh(const Vector2D &va, Vector2D &vb);
+		static void Vector2DBuild(const Vector2D &va, const Vector2D &vb, Vector2D &vbuild);  //va + vbuild = vb
+		static float Vector2DCosTh(const Vector2D &va, const Vector2D &vb);  //两个向量夹角的cos
 		static void Vector2DPrint(const Vector2D &va, char *name);
 
 		//3D向量函数
@@ -395,8 +400,8 @@ namespace T3D {
 		static float Vector3DLength(const Vector3D &va);
 		static float Vector3DLengthFast(const Vector3D &va);
 		static void Vector3DNormalize(Vector3D &va);
-		static void Vector3DBuild(const Vector3D &va, Vector3D &vb);
-		static float Vector3DCosTh(const Vector3D &va, Vector3D &vb);
+		static void Vector3DBuild(const Vector3D &va, const Vector3D &vb, Vector3D &vbuild);
+		static float Vector3DCosTh(const Vector3D &va, const Vector3D &vb);
 		static void Vector3DPrint(const Vector3D &va, char *name);
 
 		//4D向量函数
@@ -408,8 +413,8 @@ namespace T3D {
 		static float Vector4DLength(const Vector4D &va);
 		static float Vector4DLengthFast(const Vector4D &va);
 		static void Vector4DNormalize(Vector4D &va);
-		static void Vector4DBuild(const Vector4D &va, Vector4D &vb);
-		static float Vector4DCosTh(const Vector4D &va, Vector4D &vb);
+		static void Vector4DBuild(const Vector4D &va, const Vector4D &vb, Vector4D &vbuild);
+		static float Vector4DCosTh(const Vector4D &va, const Vector4D &vb);
 		static void Vector4DPrint(const Vector4D &va, char *name);
 
 		//2*2矩阵
@@ -417,17 +422,17 @@ namespace T3D {
 		static void PrintMat22(const Matrix22 &matrix, char *name);
 		static float Mat22Det(const Matrix22 &matrix);  //行列式
 		static void Mat22Add(const Matrix22 &ma, const Matrix22 &mb, Matrix22 &msum);
-		static void Mat22Mul(const Matrix22 &mb, const Matrix22 &mb, Matrix22 &msub);
-		static int Mat22Inverse(const Matrix22 &m, Matrix22 &mi);
+		static void Mat22Mul(const Matrix22 &ma, const Matrix22 &mb, Matrix22 &mprod);
+		static int Mat22Inverse(const Matrix22 &m, Matrix22 &mi);  //逆矩阵
 		static int Solve22System(const Matrix22 &A, const Matrix22 &X, const Matrix22 &B);
+		static void Mat12MulMat32(const Matrix12 &ma, const Matrix32 &mb, Matrix12 &mprod);  //matrix12最后一个使用1补上
 
 		//3*3矩阵
-		static int Mat13MulMat32(const Matrix13 &ma, const Matrix32 &mb, Matrix12 &mprod);
 		static int Mat13MulMat33(const Matrix13 &ma, const Matrix33 &mb, Matrix13 &mprod);
-		static int Mat33MulMat33(const Matrix33 &ma, const Matrix33 &mb, Matrix33 &mprod);
+		static void Mat33MulMat33(const Matrix33 &ma, const Matrix33 &mb, Matrix33 &mprod);
 		static int Mat32Init(Matrix32 &ma, float m00, float m01, float m10, float m11, float m20, float m21);
-		static void Mat33Add(const Matrix33 &ma, const Matrix33 &mb, Matrix33 &msub);
-		static void Vec3MulMat33(const Vector3D &va, const Matrix33 &mb, const Vector3D &vprod);
+		static void Mat33Add(const Matrix33 &ma, const Matrix33 &mb, Matrix33 &msum);
+		static void Vec3MulMat33(const Vector3D &va, const Matrix33 &mb, Vector3D &vprod);
 		static int Mat33Inverse(const Matrix33 &m, Matrix33 &mi);
 		static void Mat33Init(Matrix33 &m, float m00, float m01, float m02, float m10, float m11, float m12, float m20, float m21, float m22);
 		static int SolveMat33System(Matrix33 &A, Matrix33 &X, Matrix33 &B);
@@ -437,12 +442,12 @@ namespace T3D {
 		// 4 * 4 矩阵
 		static void Mat44Add(const Matrix44 &ma, const Matrix44 &mb, Matrix44 &msum);
 		static void Mat44Mul(const Matrix44 &ma, const Matrix44 &mb, Matrix44 &mprod);
-		static void Mat14MulMat44(const Matrix14 &ma, const Matrix44 &mb, Matrix44 &mprod);
+		static void Mat14MulMat44(const Matrix14 &ma, const Matrix44 &mb, Matrix14 &mprod);
 		static void V3dMulMat44(const Vector3D &va, const Matrix44 &mb, Vector3D &vprod);
 		static void V3dMulMat43(const Vector3D &va, const Matrix43 &mb, Vector3D &vprod);
 		static void V4dMulMat44(const Vector4D &va, const Matrix44 &mb, Vector4D &vprod);
 		static void V4dMulMat43(const Vector4D &va, const Matrix43 &mb, Vector4D &vprod);
-		static void Mat44Inverse(const Matrix44 &m, const Matrix44 &mi);
+		static int Mat44Inverse(const Matrix44 &m, Matrix44 &mi);
 		static void Mat44Init(Matrix44 &m, float m00, float m01, float m02, float m03, float m10, float m11, float m12, float m13, float m20, float m21, float m22, float m23, float m30, float m31, float m32, float m33);
 		static void PrintMat44(const Matrix44 &ma, char *name);
 
@@ -458,21 +463,28 @@ namespace T3D {
 		static void QuatMul(const Quat &q1, const Quat &q2, Quat &qprod);
 		static void QuatTripleProduct(const Quat &q1, const Quat &q2, const Quat &q3, Quat &qprod);
 		static void V3DThetaToQuat(Quat &q, const Vector3D &v, float theta);
-		static void V3DThetaToQuat(Quat &q, const Vector3D &v, float theta);
+		static void V4DThetaToQuat(Quat &q, const Vector4D &v, float theta);
 		static void EulerZYXToQuat(Quat &q, float theta_z, float theta_y, float theta_x);
 		static void QuatToV3DTheta(const Quat &q, Vector3D &v, float &theta);
 		static void QuatPrint(const Quat &q, char *name);
 
 
 		//2d参数化直线函数
-		static void InitParmLine2D(const Point2D &pInit, const Point2D &PTerm, ParmLine2D &p);
+		static void InitParmLine2D(const Point2D &pInit, const Point2D &pTerm, ParmLine2D &p);
 		static void ComputeParmLine2D(ParmLine2D &p, float t, Point2D &pt);
 		static int IntersectParmLines2D(ParmLine2D &p1, ParmLine2D &p2, Point2D &pt);
 
+		//3d参数化直线函数
+		static void InitParmLine3D(const Point3D &pInit, const Point3D &pTerm, ParmLine3D &p);
+		static void ComputeParmLine3D(const ParmLine3D &p, float t, Point3D &pt);
+
 		// 3d平面函数
-		static void Plane3DInit(Plane3D &plane, const Point3D &p0, const Vector3D &normal, int normalize);
+		static void Plane3DInit(Plane3D &plane, const Point3D &p0, const Vector3D &normal, bool normalize);
 		static float ComputePointInPlane3D(const Point3D &pt, const Plane3D &plane);
 		static int IntersectParmLinePlane3D(const ParmLine3D &line, Plane3D &plane, float &t, Point3D &pt);
+
+		static float cos_look[361];
+		static float sin_look[361];
 
 	};
 }
