@@ -40,7 +40,7 @@ namespace T3D {
 			m_y = 0;
 		}
 
-		void InitXY(int x, int y) {
+		void InitXY(float x, float y) {
 			m_x = x;
 			m_y = y;
 		}
@@ -64,7 +64,7 @@ namespace T3D {
 			m_z = 0;
 		}
 
-		void InitXYZ(int x, int y, int z) {
+		void InitXYZ(float x, float y, float z) {
 			m_x = x;
 			m_y = y;
 			m_z = z;
@@ -136,12 +136,8 @@ namespace T3D {
 		void InitZero() {
 			memset((void*)m_mat, 0, sizeof(Matrix44));
 		}
-		
-		void Identity() {
-			memcpy((void*)m_mat, (void*)&IMAT44, sizeof(Matrix44));
-		}
 
-		void InitWithMat44(const Matrix22 &m44) {
+		void InitWithMat44(const Matrix44 &m44) {
 			memcpy((void*)m_mat, (void*)&m44, sizeof(Matrix44));
 		}
 
@@ -162,11 +158,7 @@ namespace T3D {
 			memset((void*)m_mat, 0, sizeof(Matrix43));
 		}
 
-		void Identity() {
-			memcpy((void*)m_mat, (void*)&IMAT43, sizeof(Matrix43));
-		}
-
-		void InitWithMat43(const Matrix22 &m43) {
+		void InitWithMat43(const Matrix43 &m43) {
 			memcpy((void*)m_mat, (void*)&m43, sizeof(Matrix43));
 		}
 	};
@@ -186,10 +178,6 @@ namespace T3D {
 
 		void InitZero() {
 			memset((void*)m_mat, 0, sizeof(Matrix33));
-		}
-
-		void Identity() {
-			memcpy((void*)m_mat, (void*)&IMAT33, sizeof(Matrix33));
 		}
 
 		void InitWithMat33(const Matrix33 &m33) {
@@ -231,10 +219,6 @@ namespace T3D {
 			memset((void*)m_mat, 0, sizeof(Matrix22));
 		}
 
-		void Identity() {
-			memcpy((void*)m_mat, (void*)&IMAT22, sizeof(Matrix22));
-		}
-
 		void InitWithMat22(const Matrix22 &m22) {
 			memcpy((void*)m_mat, (void*)&m22, sizeof(Matrix22));
 		}
@@ -255,6 +239,31 @@ namespace T3D {
 		void InitZero() {
 			memset((void*)m_mat, 0, sizeof(Matrix12));
 		}
+	};
+
+	const Matrix44 IMAT44 = {
+		1, 0, 0, 0,
+		0, 1, 0, 0,
+		0, 0, 1, 0,
+		0, 0, 0, 1
+	};
+
+	const Matrix43 IMAT43 = {
+		1, 0, 0,
+		0, 1, 0,
+		0, 0, 1,
+		0, 0, 0
+	};
+
+	const Matrix33 IMAT33 = {
+		1, 0, 0,
+		0, 1, 0,
+		0, 0, 1
+	};
+
+	const struct Matrix22 IMAT22 = {
+		1, 0,
+		0, 1
 	};
 
 	struct Quat
@@ -318,40 +327,21 @@ namespace T3D {
 #define PARM_LINE_INTERSECT_OUT_SEGMENT 2
 #define PARM_LINE_INTERSECT_EVERYWHERE 3
 
-	const Matrix44 IMAT44 = {	
-		1, 0, 0, 0,
-		0, 1, 0, 0,
-		0, 0, 1, 0,
-		0, 0, 0, 1
-	};
-
-	const Matrix43 IMAT43 = {
-		1, 0, 0, 
-		0, 1, 0,
-		0, 0, 1,
-		0, 0, 0
-	};
-
-	const Matrix33 IMAT33 = {
-		1, 0, 0,
-		0, 1, 0,
-		0, 0, 1
-	};
-
-	const struct Matrix22 IMAT22 = {
-		1, 0,
-		0, 1
-	};
-
 #define MIN(a, b) (((a) < (b)) ? (a) : (b))
 #define MAX(a, b) (((a) > (b)) ? (a) : (b))
 
 #define SWAP(a, b, t) {t = a; a = b; b = t;}
 
-#define DEG_TO_RAN(ang) ((ang)*PI / 180.0)
-#define RAD_TO_DEG(rads) ((rads)*180.0/PI)
+#define DEG_TO_RAN(ang) ((ang) * PI / 180.0f)
+#define RAD_TO_DEG(rads) ((rads) * 180.0f / PI)
 
 #define RAND_RANGE(x, y) ( (x) + (rand() % ((y) - (x) + 1)))
+
+// macros to set the identity matrix
+#define MAT_IDENTITY_2X2(m) {memcpy((void *)(m), (void *)&IMAT22, sizeof(Matrix22));}
+#define MAT_IDENTITY_3X3(m) {memcpy((void *)(m), (void *)&IMAT33, sizeof(Matrix33));}
+#define MAT_IDENTITY_4X4(m) {memcpy((void *)(m), (void *)&IMAT44, sizeof(Matrix44));}
+#define MAT_IDENTITY_4X3(m) {memcpy((void *)(m), (void *)&IMAT33, sizeof(Matrix43));}
 
 
 	//ÊýÑ§º¯Êý

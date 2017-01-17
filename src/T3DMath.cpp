@@ -381,7 +381,7 @@ namespace T3D {
 		float det = m.m_mat[0][0] * m.m_mat[1][1] - m.m_mat[0][1] * m.m_mat[1][0];  //计算行列式
 		if (fabs(det) < EPSILON_E5) return 1;
 
-		float det_inv = 1.0 / det;
+		float det_inv = 1.0f / det;
 		mi.m_mat[0][0] = m.m_mat[1][1] * det_inv;
 		mi.m_mat[0][1] = m.m_mat[0][1] * det_inv;
 		mi.m_mat[1][0] = m.m_mat[1][0] * det_inv;
@@ -416,6 +416,8 @@ namespace T3D {
 		ma.m_mat[1][1] = m11;
 		ma.m_mat[2][0] = m20;
 		ma.m_mat[2][1] = m21;
+
+		return 0;
 	}
 
 
@@ -442,6 +444,8 @@ namespace T3D {
 		mprod.m_mat[0][0] = ma.m_mat[0][0] * mb.m_mat[0][0] + ma.m_mat[0][1] * mb.m_mat[1][0] + ma.m_mat[0][2] * mb.m_mat[2][0];
 		mprod.m_mat[0][1] = ma.m_mat[0][0] * mb.m_mat[0][1] + ma.m_mat[0][1] * mb.m_mat[1][1] + ma.m_mat[0][2] * mb.m_mat[2][1];
 		mprod.m_mat[0][2] = ma.m_mat[0][0] * mb.m_mat[0][2] + ma.m_mat[0][1] * mb.m_mat[1][2] + ma.m_mat[0][2] * mb.m_mat[2][2];
+
+		return 0;
 	}
 
 	void CommonMath::Mat33MulMat33(const Matrix33 &ma, const Matrix33 &mb, Matrix33 &mprod)
@@ -470,7 +474,7 @@ namespace T3D {
 		float det = Mat33Det(m);
 		if (fabs(det) < EPSILON_E5) return 1;
 
-		float det_inv = 1.0 / det;
+		float det_inv = 1.0f / det;
 
 		mi.m_mat[0][0] = det_inv*(m.m_mat[1][1] * m.m_mat[2][2] - m.m_mat[2][1] * m.m_mat[1][2]);
 		mi.m_mat[1][0] = -det_inv*(m.m_mat[1][0] * m.m_mat[2][2] - m.m_mat[2][0] * m.m_mat[1][2]);
@@ -600,16 +604,16 @@ namespace T3D {
 
 	void CommonMath::V3dMulMat44(const Vector3D & va, const Matrix44 & mb, Vector3D & vprod)
 	{
-		vprod.m_x = va.m_x * mb.m_mat[0][0] + va.m_y * mb.m_mat[1][0] + va.m_z * mb.m_mat[2][0] + 1.0 * mb.m_mat[3][0];
-		vprod.m_y = va.m_x * mb.m_mat[0][1] + va.m_y * mb.m_mat[1][1] + va.m_z * mb.m_mat[2][1] + 1.0 * mb.m_mat[3][1];
-		vprod.m_z = va.m_x * mb.m_mat[0][2] + va.m_y * mb.m_mat[1][2] + va.m_z * mb.m_mat[2][2] + 1.0 * mb.m_mat[3][2];
+		vprod.m_x = va.m_x * mb.m_mat[0][0] + va.m_y * mb.m_mat[1][0] + va.m_z * mb.m_mat[2][0] + 1.0f * mb.m_mat[3][0];
+		vprod.m_y = va.m_x * mb.m_mat[0][1] + va.m_y * mb.m_mat[1][1] + va.m_z * mb.m_mat[2][1] + 1.0f * mb.m_mat[3][1];
+		vprod.m_z = va.m_x * mb.m_mat[0][2] + va.m_y * mb.m_mat[1][2] + va.m_z * mb.m_mat[2][2] + 1.0f * mb.m_mat[3][2];
 	}
 
 	void CommonMath::V3dMulMat43(const Vector3D & va, const Matrix43 & mb, Vector3D & vprod)
 	{
-		vprod.m_x = va.m_x * mb.m_mat[0][0] + va.m_y * mb.m_mat[1][0] + va.m_z * mb.m_mat[2][0] + 1.0 * mb.m_mat[3][0];
-		vprod.m_y = va.m_x * mb.m_mat[0][1] + va.m_y * mb.m_mat[1][1] + va.m_z * mb.m_mat[2][1] + 1.0 * mb.m_mat[3][1];
-		vprod.m_z = va.m_x * mb.m_mat[0][2] + va.m_y * mb.m_mat[1][2] + va.m_z * mb.m_mat[2][2] + 1.0 * mb.m_mat[3][2];
+		vprod.m_x = va.m_x * mb.m_mat[0][0] + va.m_y * mb.m_mat[1][0] + va.m_z * mb.m_mat[2][0] + 1.0f * mb.m_mat[3][0];
+		vprod.m_y = va.m_x * mb.m_mat[0][1] + va.m_y * mb.m_mat[1][1] + va.m_z * mb.m_mat[2][1] + 1.0f * mb.m_mat[3][1];
+		vprod.m_z = va.m_x * mb.m_mat[0][2] + va.m_y * mb.m_mat[1][2] + va.m_z * mb.m_mat[2][2] + 1.0f * mb.m_mat[3][2];
 	}
 
 	void CommonMath::V4dMulMat44(const Vector4D & va, const Matrix44 & mb, Vector4D & vprod)
@@ -773,7 +777,7 @@ namespace T3D {
 		float plane_dot_line = Vector3DDot(line.m_vec, plane.m_normal);
 		if (fabs(plane_dot_line) < EPSILON_E5) return PARM_LINE_NO_INTERSECT;
 
-		float t = -(plane.m_normal.m_x * line.m_p0.m_x +
+		t = -(plane.m_normal.m_x * line.m_p0.m_x +
 			plane.m_normal.m_y * line.m_p0.m_y +
 			plane.m_normal.m_z * line.m_p0.m_z -
 			plane.m_normal.m_x * plane.m_p0.m_x -
@@ -798,7 +802,7 @@ namespace T3D {
 		//使用3d向量和一个角度来初始化一个四元数
 
 		//方向向量必须是单位向量，角度的单位是弧度
-		float theta_div_2 = (0.5) * theta;
+		float theta_div_2 = 0.5f * theta;
 		
 		//计算四元数
 		float sinf_theta = sinf(theta_div_2);
@@ -814,7 +818,7 @@ namespace T3D {
 		//使用3d向量和一个角度来初始化一个四元数
 
 		//方向向量必须是单位向量，角度的单位是弧度
-		float theta_div_2 = (0.5) * theta;
+		float theta_div_2 = 0.5f * theta;
 
 		//计算四元数
 		float sinf_theta = sinf(theta_div_2);
@@ -830,13 +834,13 @@ namespace T3D {
 		//这个函数根据绕x, y, z的旋转的角度，创建一个的zyx顺序进行旋转的四元数 应该还有11个根据旋转角度创建四元数的函数
 
 		//预先计算一些值
-		float cos_z_2 = 0.5 * cosf(theta_z);
-		float cos_y_2 = 0.5 * cosf(theta_y);
-		float cos_x_2 = 0.5 * cosf(theta_x);
+		float cos_z_2 = 0.5f * cosf(theta_z);
+		float cos_y_2 = 0.5f * cosf(theta_y);
+		float cos_x_2 = 0.5f * cosf(theta_x);
 
-		float sin_z_2 = 0.5 * sinf(theta_z);
-		float sin_y_2 = 0.5 * sinf(theta_y);
-		float sin_x_2 = 0.5 * sinf(theta_x); 
+		float sin_z_2 = 0.5f * sinf(theta_z);
+		float sin_y_2 = 0.5f * sinf(theta_y);
+		float sin_x_2 = 0.5f * sinf(theta_x); 
 
 		//计算四元数
 		q.m_q0 = cos_z_2 * cos_y_2 * cos_x_2 + sin_x_2 * sin_z_2 * sin_y_2;
@@ -851,7 +855,7 @@ namespace T3D {
 
 		theta = acosf(q.m_q0);
 
-		float sinf_theta_inv = 1.0 / sinf(theta);
+		float sinf_theta_inv = 1.0f / sinf(theta);
 		v.m_x = q.m_qv.m_x * sinf_theta_inv;
 		v.m_y = q.m_qv.m_y * sinf_theta_inv;
 		v.m_z = q.m_qv.m_z * sinf_theta_inv;
@@ -907,7 +911,7 @@ namespace T3D {
 	}
 	void CommonMath::QuatInverse(const Quat & q, Quat & qi)
 	{
-		float norm2_inv = 1.0 / (q.m_q0 * q.m_q0 + q.m_qv.m_x * q.m_qv.m_x + q.m_qv.m_y * q.m_qv.m_y + q.m_qv.m_z * q.m_qv.m_z);
+		float norm2_inv = 1.0f / (q.m_q0 * q.m_q0 + q.m_qv.m_x * q.m_qv.m_x + q.m_qv.m_y * q.m_qv.m_y + q.m_qv.m_z * q.m_qv.m_z);
 
 		qi.m_q0 = q.m_q0 * norm2_inv;
 		qi.m_qv.InitWithVec3(q.m_qv);
@@ -925,7 +929,7 @@ namespace T3D {
 		float prd_7 = (q1.m_q0 - q1.m_qv.m_y) * (q2.m_q0 + q2.m_qv.m_z);
 
 		float prd_8 = prd_5 + prd_6 + prd_7;
-		float prd_9 = 0.5 * (prd_4 + prd_8);
+		float prd_9 = 0.5f * (prd_4 + prd_8);
 
 		// and finally build up the result with the temporary products
 
