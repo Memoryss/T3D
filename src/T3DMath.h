@@ -29,6 +29,22 @@ namespace T3D {
 		}
 	};
 
+	struct Point4D
+	{
+		float m_x;
+		float m_y;
+		float m_z;
+		float m_w;
+
+		void Init(const Point4D &p4)
+		{
+			m_x = p4.m_x;
+			m_y = p4.m_y;
+			m_z = p4.m_z;
+			m_w = p4.m_w;
+		}
+	};
+
 	//不包含齐次坐标的w分量
 	struct Vector2D
 	{

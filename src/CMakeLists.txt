@@ -3,4 +3,7 @@ add_library(T3D
 	T3DMath.cpp
 	T3DLog.h
 	T3DLog.cpp
+	T3DMesh.h
+	T3DMesh.cpp
+	T3DCommon.h
 )
