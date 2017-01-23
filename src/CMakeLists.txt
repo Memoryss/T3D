@@ -5,5 +5,5 @@ add_library(T3D
 	T3DLog.cpp
 	T3DMesh.h
 	T3DMesh.cpp
-	T3DCommon.h
+	T3DUtil.h
 )
