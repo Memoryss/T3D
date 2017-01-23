@@ -56,6 +56,8 @@ namespace T3D {
 
 		int m_num_polys;  //多边形数
 		std::vector<Triangle> m_plist;  //多边形
+
+		int ComputeRadius();
 	};
 	
 
@@ -73,6 +75,9 @@ namespace T3D {
 		std::vector<TriangleFace> m_faces;
 
 		int m_num_trangleface;
+
+		void TransForm(const Matrix44 &mt, int coord_select);
+
 	};
 
 	class PLGLoader
@@ -95,7 +100,7 @@ namespace T3D {
 #define POLY4DV1_ATTR_SHADE_MODE_PURE 0X0020
 #define POLY4DV1_ATTR_SHADE_MODE_FLAT 0X0040
 #define POLY4DV1_ATTR_SHADE_MODE_GOURAUD 0X0080
-#define POLY4DV1_ATTR_SHADE_MODE_PHONE 0X0100
+#define POLY4DV1_ATTR_SHADE_MODE_PHONG 0X0100
 
 #define POLY4DV1_STATE_ACTIVE 0X0001
 #define POLY4DV1_STATE_CLIPPED 0X0002
@@ -108,7 +113,7 @@ namespace T3D {
 
 //加载plx文件
 #define PLX_RGB_MASK 0X8000  //抽取RGB/索引颜色模式的掩码
-#define PLX_SHADE_MODE_MASK 0X600	 //抽取着色模式额掩码
+#define PLX_SHADE_MODE_MASK 0X6000	 //抽取着色模式额掩码
 #define PLX_2SIDED_MASK  0X1000 //抽取双面状态设置的掩码
 #define PLX_COLOR_MASK  0X0fff  //每个rgb分量4位
 
@@ -124,7 +129,12 @@ namespace T3D {
 #define PLX_SHADE_MODE_PURE_FLAG  0X0000  //多边形使用固定颜色
 #define PLX_SHADE_MODE_FLAT_FLAG  0X2000  //恒定着色
 #define PLX_SHADE_MODE_GOURAUD_FLAG  0X4000 //gouraud着色
-#define PLX_SHADE_MODE_PLONE_FLAG  0X6000   //phone着色
+#define PLX_SHADE_MODE_PLONG_FLAG  0X6000   //phone着色
+
+//trans
+#define TRANSFORM_LOCAL_ONLY 0
+#define TRANSFORM_TRANS_ONLY 1
+#define TRANSFORM_LOCAL_TO_TRANS 2
 
 #endif // !__T3DMESH_H__
 

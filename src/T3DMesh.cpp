@@ -90,7 +90,8 @@ namespace T3D {
 			Log::WriteError("vectex %d = %f, %f, %f, %f\n", i, point.m_x, point.m_y, point.m_z, point.m_w);
 		}
 
-		//计算平均半径和最大半径 TODO
+		//计算平均半径和最大半径 
+		obj->ComputeRadius();
 		Log::WriteError("Object average radius = %f, max radius\n", obj->m_attr, obj->m_max_radisus);
 
 		int poly_surface_desc = 0; //plg/plx多边形描述符
@@ -144,8 +145,106 @@ namespace T3D {
 				int green = (poly_surface_desc & 0x00f0) >> 4;
 				int blue = (poly_surface_desc & 0x000f);
 
-				obj->m_plist[poly].m_color = RGB1
+				//文件中 rgb颜色值总是4.4.4格式，图形卡中rgb颜色5.5.5或者5.6.5
+				//因此需要将4.4.4的rgb值转换为8.8.8
+				obj->m_plist[poly].m_color = RGB16Bit(red, green, blue);
+				Log::WriteError("RGB Color = [%d, %d, %d]\n", red, green, blue);
 			}
+			else
+			{
+				//使用的时8位颜色索引
+				SET_BIT(obj->m_plist[poly].m_attr, POLY4DV1_ATTR_8BITCOLOR);
+				//提取最后8位即可得到颜色索引
+				obj->m_plist[poly].m_color = (poly_surface_desc & 0x00ff);
+				Log::WriteError("8-bit color index = %d\n", obj->m_plist[poly].m_color);
+			}
+
+			//处理着色模式
+			int shade_mode = (poly_surface_desc & PLX_SHADE_MODE_MASK);
+
+			//设置多边形的着色模式
+			switch (shade_mode)
+			{
+			case PLX_SHADE_MODE_PURE_FLAG:
+				SET_BIT(obj->m_plist[poly].m_attr, POLY4DV1_ATTR_SHADE_MODE_PURE);
+				Log::WriteError("Shade mode = pure\n");
+				break;
+			case PLX_SHADE_MODE_FLAT_FLAG:
+				SET_BIT(obj->m_plist[poly].m_attr, POLY4DV1_ATTR_SHADE_MODE_FLAT);
+				Log::WriteError("Shade mode = flat\n");
+				break;
+			case PLX_SHADE_MODE_PLONG_FLAG:
+				SET_BIT(obj->m_plist[poly].m_attr, POLY4DV1_ATTR_SHADE_MODE_PHONG);
+				Log::WriteError("Shade mode = plong\n");
+				break;
+			case PLX_SHADE_MODE_GOURAUD_FLAG:
+				SET_BIT(obj->m_plist[poly].m_attr, POLY4DV1_ATTR_SHADE_MODE_GOURAUD);
+				Log::WriteError("Shade mode = gouraud\n");
+				break;
+			default:
+				break;
+			}
+
+			obj->m_plist[poly].m_state = POLY4DV1_STATE_ACTIVE;
+		} //End of poly
+
+		//初始化物体朝向 与坐标轴平行
+		obj->m_ux.InitXYZW(1, 0, 0, 1);
+		obj->m_uy.InitXYZW(0, 1, 0, 1);
+		obj->m_uz.InitXYZW(0, 0, 1, 1);
+
+		fclose(fp);
+		return 0;
+	}//end of load plg
+
+	int Object::ComputeRadius()
+	{
+		m_avg_radius = 0;
+		m_max_radisus = 0;
+
+		for (int i = 0; i < m_vlist_local.size(); ++i)
+		{
+			float dist_to_vertex = sqrt(m_vlist_local[i].m_x * m_vlist_local[i].m_x + m_vlist_local[i].m_y * m_vlist_local[i].m_y + m_vlist_local[i].m_z * m_vlist_local[i].m_z);
+
+			m_avg_radius += dist_to_vertex;
+			if (dist_to_vertex > m_max_radisus) m_max_radisus = dist_to_vertex;
+		}
+
+		if (m_vlist_local.size() > 0) m_avg_radius /= m_vlist_local.size();
+
+		return m_max_radisus;
+	}
+
+	void RenderList::TransForm(const Matrix44 & mt, int coord_select)
+	{
+		switch (coord_select)
+		{
+		case TRANSFORM_LOCAL_ONLY:
+			for (int poly = 0; poly < m_facePtrs.size(); ++poly)
+			{
+				TriangleFace *face = m_facePtrs[poly];
+				//判断多边形是否存在，是否有效
+				//线性引擎中 背面无关紧要
+				if (face == NULL || !(face->m_state & POLY4DV1_STATE_ACTIVE) || face->m_state & POLY4DV1_STATE_BACKFACE || face->m_state & POLY4DV1_STATE_CLIPPED)
+				{
+					continue;
+				}
+
+				//如果满足条件，进行变化
+				for (int vertex = 0; vertex < 3; ++vertex)
+				{
+					Point4D presult;  //用于暂时存储变化的结果
+					CommonMath::V4dMulMat44(face->m_vlist[vertex])
+				}
+			}
+			break;
+		case TRANSFORM_TRANS_ONLY:
+			break;
+		case TRANSFORM_LOCAL_TO_TRANS:
+			break;
+		default:
+			break;
 		}
 	}
-}
+	
+} //T3D
