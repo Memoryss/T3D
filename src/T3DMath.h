@@ -117,6 +117,14 @@ namespace T3D {
 			memcpy((void*)m_mat, (void*)&m44, sizeof(Matrix44));
 		}
 
+		void Identity() {
+			memset((void*)m_mat, 0, sizeof(Matrix44));
+			m_mat[0][0] = 1.0f;
+			m_mat[1][1] = 1.0f;
+			m_mat[2][2] = 1.0f;
+			m_mat[3][3] = 1.0f;
+		}
+
 		void Transpose(Matrix44 &m44) {
 			for (int i = 0; i < 4; ++i) {
 				for (int j = 0; j < 4; ++j) {

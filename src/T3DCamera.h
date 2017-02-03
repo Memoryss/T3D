@@ -24,8 +24,9 @@ namespace T3D {
 		Vec4 m_n;
 		Vec4 m_target; //uvn模型的目標位置
 
-		float m_view_dist_h;  //水平視距和垂直視距
-		float m_view_dist_v;
+		//float m_view_dist_h;  //水平視距和垂直視距
+		//float m_view_dist_v;
+		float m_view_dist;
 
 		float m_fov; //水平方向和垂直方向的視野
 
