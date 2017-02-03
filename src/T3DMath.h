@@ -1,52 +1,12 @@
-#ifndef __T3DMATH_H__
-#define __T3DMATH_H__
+#ifndef __T3D_MATH_H__
+#define __T3D_MATH_H__
 
 #include <string.h>
 
 namespace T3D {
 
-	struct Point2D
-	{
-		float m_x;
-		float m_y;
-
-		void Init(const Point2D &p2) {
-			m_x = p2.m_x;
-			m_y = p2.m_y;
-		}
-	};
-
-	struct Point3D
-	{
-		float m_x;
-		float m_y;
-		float m_z;
-
-		void Init(const Point3D &p3) {
-			m_x = p3.m_x;
-			m_y = p3.m_y;
-			m_z = p3.m_z;
-		}
-	};
-
-	struct Point4D
-	{
-		float m_x;
-		float m_y;
-		float m_z;
-		float m_w;
-
-		void Init(const Point4D &p4)
-		{
-			m_x = p4.m_x;
-			m_y = p4.m_y;
-			m_z = p4.m_z;
-			m_w = p4.m_w;
-		}
-	};
-
 	//不包含齐次坐标的w分量
-	struct Vector2D
+	struct Vec2
 	{
 		float m_x;
 		float m_y;
@@ -61,14 +21,14 @@ namespace T3D {
 			m_y = y;
 		}
 
-		void InitWithVec2(const Vector2D & vec2) {
+		void InitWithVec2(const Vec2 & vec2) {
 			m_x = vec2.m_x;
 			m_y = vec2.m_y;
 		}
 	};
 
 	//不包含齐次坐标的w分量
-	struct Vector3D
+	struct Vec3
 	{
 		float m_x;
 		float m_y;
@@ -86,7 +46,7 @@ namespace T3D {
 			m_z = z;
 		}
 
-		void InitWithVec3(const Vector3D & vec3) {
+		void InitWithVec3(const Vec3 & vec3) {
 			m_x = vec3.m_x;
 			m_y = vec3.m_y;
 			m_z = vec3.m_z;
@@ -95,7 +55,7 @@ namespace T3D {
 
 
 	//包含齐次坐标的三维向量
-	struct Vector4D
+	struct Vec4
 	{
 		float m_x;
 		float m_y;
@@ -116,7 +76,7 @@ namespace T3D {
 			m_w = w;
 		}
 
-		void InitWithVec4(const Vector4D & vec4) {
+		void InitWithVec4(const Vec4 & vec4) {
 			m_x = vec4.m_x;
 			m_y = vec4.m_y;
 			m_z = vec4.m_z;
@@ -127,22 +87,22 @@ namespace T3D {
 	//参数化方程
 	struct ParmLine2D
 	{
-		Point2D m_p0;
-		Point2D m_p1;
-		Vector2D m_vec;
+		Vec2 m_p0;
+		Vec2 m_p1;
+		Vec2 m_vec;
 	};
 
 	struct ParmLine3D
 	{
-		Point3D m_p0;
-		Point3D m_p1;
-		Vector3D m_vec;
+		Vec3 m_p0;
+		Vec3 m_p1;
+		Vec3 m_vec;
 	};
 
 	struct Plane3D
 	{
-		Point3D m_p0;
-		Vector3D m_normal;
+		Vec3 m_p0;
+		Vec3 m_normal;
 	};
 
 	struct Matrix44
@@ -285,7 +245,7 @@ namespace T3D {
 	struct Quat
 	{
 		float m_q0; //实部
-		Vector3D m_qv; //虚部
+		Vec3 m_qv; //虚部
 
 		void InitZero() {
 			m_qv.m_x = 0;
@@ -299,7 +259,7 @@ namespace T3D {
 			m_qv.InitWithVec3(quat.m_qv);
 		}
 
-		void InitWithVec3(const Vector3D &vec3) {
+		void InitWithVec3(const Vec3 &vec3) {
 			m_q0 = 0;
 			m_qv.InitWithVec3(vec3);
 		}
@@ -378,50 +338,50 @@ namespace T3D {
 		static float FastDistance3D(float x, float y, float z);
 
 		//极坐标
-		static void Polar2DToPoint2D(const Polar2D &polar, Point2D &point);
-		static void Point2DToPolar2D(const Point2D &point, Polar2D &polar);
-		static void Cylindrical3DToPoint3D(const Cylindrical3D &c3d, Point3D &p3d);
-		static void Point3DToCylindrical3D(const Point3D &p3d, Cylindrical3D &c3d);
-		static void Spherical3DToPoint3D(const Spherical3D &s3d, Point3D &p3d);
-		static void Point3DToSpherical3D(const Point3D &p3d, Spherical3D &s3d);
+		static void Polar2DToVec2(const Polar2D &polar, Vec2 &point);
+		static void Vec2ToPolar2D(const Vec2 &point, Polar2D &polar);
+		static void Cylindrical3DToVec3(const Cylindrical3D &c3d, Vec3 &p3d);
+		static void Vec3ToCylindrical3D(const Vec3 &p3d, Cylindrical3D &c3d);
+		static void Spherical3DToVec3(const Spherical3D &s3d, Vec3 &p3d);
+		static void Vec3ToSpherical3D(const Vec3 &p3d, Spherical3D &s3d);
 
 		//2d向量函数
-		static void Vector2DAdd(const Vector2D &va, const Vector2D &vb, Vector2D& vsum);
-		static void Vector2DSub(const Vector2D &va, const Vector2D &vb, Vector2D& vsub);
-		static void Vector2DScale(float k, Vector2D &va);
-		static float Vector2DDot(const Vector2D &va, const Vector2D &vb);
-		static float Vector2DLength(const Vector2D &va);
-		static float Vector2DLengthFast(const Vector2D &va);
-		static void Vector2DNormalize(Vector2D &va);
-		static void Vector2DBuild(const Vector2D &va, const Vector2D &vb, Vector2D &vbuild);  //va + vbuild = vb
-		static float Vector2DCosTh(const Vector2D &va, const Vector2D &vb);  //两个向量夹角的cos
-		static void Vector2DPrint(const Vector2D &va, char *name);
+		static void Vec2Add(const Vec2 &va, const Vec2 &vb, Vec2& vsum);
+		static void Vec2Sub(const Vec2 &va, const Vec2 &vb, Vec2& vsub);
+		static void Vec2Scale(float k, Vec2 &va);
+		static float Vec2Dot(const Vec2 &va, const Vec2 &vb);
+		static float Vec2Length(const Vec2 &va);
+		static float Vec2LengthFast(const Vec2 &va);
+		static void Vec2Normalize(Vec2 &va);
+		static void Vec2Build(const Vec2 &va, const Vec2 &vb, Vec2 &vbuild);  //va + vbuild = vb
+		static float Vec2CosTh(const Vec2 &va, const Vec2 &vb);  //两个向量夹角的cos
+		static void Vec2Print(const Vec2 &va, char *name);
 
 		//3D向量函数
-		static void Vector3DAdd(const Vector3D &va, const Vector3D &vb, Vector3D& vsum);
-		static void Vector3DSub(const Vector3D &va, const Vector3D &vb, Vector3D& vsub);
-		static void Vector3DScale(float k, Vector3D &va);
-		static float Vector3DDot(const Vector3D &va, const Vector3D &vb);
-		static void Vector3DCross(const Vector3D &va, const Vector3D &vb, Vector3D &vc);
-		static float Vector3DLength(const Vector3D &va);
-		static float Vector3DLengthFast(const Vector3D &va);
-		static void Vector3DNormalize(Vector3D &va);
-		static void Vector3DBuild(const Vector3D &va, const Vector3D &vb, Vector3D &vbuild);
-		static float Vector3DCosTh(const Vector3D &va, const Vector3D &vb);
-		static void Vector3DPrint(const Vector3D &va, char *name);
+		static void Vec3Add(const Vec3 &va, const Vec3 &vb, Vec3& vsum);
+		static void Vec3Sub(const Vec3 &va, const Vec3 &vb, Vec3& vsub);
+		static void Vec3Scale(float k, Vec3 &va);
+		static float Vec3Dot(const Vec3 &va, const Vec3 &vb);
+		static void Vec3Cross(const Vec3 &va, const Vec3 &vb, Vec3 &vc);
+		static float Vec3Length(const Vec3 &va);
+		static float Vec3LengthFast(const Vec3 &va);
+		static void Vec3Normalize(Vec3 &va);
+		static void Vec3Build(const Vec3 &va, const Vec3 &vb, Vec3 &vbuild);
+		static float Vec3CosTh(const Vec3 &va, const Vec3 &vb);
+		static void Vec3Print(const Vec3 &va, char *name);
 
 		//4D向量函数
-		static void Vector4DAdd(const Vector4D &va, const Vector4D &vb, Vector4D& vsum);
-		static void Vector4DSub(const Vector4D &va, const Vector4D &vb, Vector4D& vsub);
-		static void Vector4DScale(float k, Vector4D &va);
-		static float Vector4DDot(const Vector4D &va, const Vector4D &vb);
-		static void Vector4DCross(const Vector4D &va, const Vector4D &vb, Vector4D &vc);
-		static float Vector4DLength(const Vector4D &va);
-		static float Vector4DLengthFast(const Vector4D &va);
-		static void Vector4DNormalize(Vector4D &va);
-		static void Vector4DBuild(const Vector4D &va, const Vector4D &vb, Vector4D &vbuild);
-		static float Vector4DCosTh(const Vector4D &va, const Vector4D &vb);
-		static void Vector4DPrint(const Vector4D &va, char *name);
+		static void Vec4Add(const Vec4 &va, const Vec4 &vb, Vec4& vsum);
+		static void Vec4Sub(const Vec4 &va, const Vec4 &vb, Vec4& vsub);
+		static void Vec4Scale(float k, Vec4 &va);
+		static float Vec4Dot(const Vec4 &va, const Vec4 &vb);
+		static void Vec4Cross(const Vec4 &va, const Vec4 &vb, Vec4 &vc);
+		static float Vec4Length(const Vec4 &va);
+		static float Vec4LengthFast(const Vec4 &va);
+		static void Vec4Normalize(Vec4 &va);
+		static void Vec4Build(const Vec4 &va, const Vec4 &vb, Vec4 &vbuild);
+		static float Vec4CosTh(const Vec4 &va, const Vec4 &vb);
+		static void Vec4Print(const Vec4 &va, char *name);
 
 		//2*2矩阵
 		static void Mat22Init(Matrix22 &matrix, float m00, float m01, float m10, float m11);
@@ -439,7 +399,7 @@ namespace T3D {
 		static void Mat33MulMat33(const Matrix33 &ma, const Matrix33 &mb, Matrix33 &mprod);
 		static int Mat32Init(Matrix32 &ma, float m00, float m01, float m10, float m11, float m20, float m21);
 		static void Mat33Add(const Matrix33 &ma, const Matrix33 &mb, Matrix33 &msum);
-		static void Vec3MulMat33(const Vector3D &va, const Matrix33 &mb, Vector3D &vprod);
+		static void Vec3MulMat33(const Vec3 &va, const Matrix33 &mb, Vec3 &vprod);
 		static int Mat33Inverse(const Matrix33 &m, Matrix33 &mi);
 		static void Mat33Init(Matrix33 &m, float m00, float m01, float m02, float m10, float m11, float m12, float m20, float m21, float m22);
 		//计算2*2方程式
@@ -451,10 +411,10 @@ namespace T3D {
 		static void Mat44Add(const Matrix44 &ma, const Matrix44 &mb, Matrix44 &msum);
 		static void Mat44Mul(const Matrix44 &ma, const Matrix44 &mb, Matrix44 &mprod);
 		static void Mat14MulMat44(const Matrix14 &ma, const Matrix44 &mb, Matrix14 &mprod);
-		static void V3dMulMat44(const Vector3D &va, const Matrix44 &mb, Vector3D &vprod);
-		static void V3dMulMat43(const Vector3D &va, const Matrix43 &mb, Vector3D &vprod);
-		static void V4dMulMat44(const Vector4D &va, const Matrix44 &mb, Vector4D &vprod);
-		static void V4dMulMat43(const Vector4D &va, const Matrix43 &mb, Vector4D &vprod);
+		static void V3dMulMat44(const Vec3 &va, const Matrix44 &mb, Vec3 &vprod);
+		static void V3dMulMat43(const Vec3 &va, const Matrix43 &mb, Vec3 &vprod);
+		static void V4dMulMat44(const Vec4 &va, const Matrix44 &mb, Vec4 &vprod);
+		static void V4dMulMat43(const Vec4 &va, const Matrix43 &mb, Vec4 &vprod);
 		static int Mat44Inverse(const Matrix44 &m, Matrix44 &mi);
 		static void Mat44Init(Matrix44 &m, float m00, float m01, float m02, float m03, float m10, float m11, float m12, float m13, float m20, float m21, float m22, float m23, float m30, float m31, float m32, float m33);
 		static void PrintMat44(const Matrix44 &ma, char *name);
@@ -470,27 +430,27 @@ namespace T3D {
 		static void QuatInverse(const Quat &q, Quat &qi);
 		static void QuatMul(const Quat &q1, const Quat &q2, Quat &qprod);
 		static void QuatTripleProduct(const Quat &q1, const Quat &q2, const Quat &q3, Quat &qprod);
-		static void V3DThetaToQuat(Quat &q, const Vector3D &v, float theta);
-		static void V4DThetaToQuat(Quat &q, const Vector4D &v, float theta);
+		static void V3DThetaToQuat(Quat &q, const Vec3 &v, float theta);
+		static void V4DThetaToQuat(Quat &q, const Vec4 &v, float theta);
 		//根据绕z y x旋转的欧拉角创建一个旋转的四元数。
 		static void EulerZYXToQuat(Quat &q, float theta_z, float theta_y, float theta_x);
-		static void QuatToV3DTheta(const Quat &q, Vector3D &v, float &theta);
+		static void QuatToV3DTheta(const Quat &q, Vec3 &v, float &theta);
 		static void QuatPrint(const Quat &q, char *name);
 
 
 		//2d参数化直线函数
-		static void InitParmLine2D(const Point2D &pInit, const Point2D &pTerm, ParmLine2D &p);
-		static void ComputeParmLine2D(ParmLine2D &p, float t, Point2D &pt);
-		static int IntersectParmLines2D(ParmLine2D &p1, ParmLine2D &p2, Point2D &pt);
+		static void InitParmLine2D(const Vec2 &pInit, const Vec2 &pTerm, ParmLine2D &p);
+		static void ComputeParmLine2D(ParmLine2D &p, float t, Vec2 &pt);
+		static int IntersectParmLines2D(ParmLine2D &p1, ParmLine2D &p2, Vec2 &pt);
 
 		//3d参数化直线函数
-		static void InitParmLine3D(const Point3D &pInit, const Point3D &pTerm, ParmLine3D &p);
-		static void ComputeParmLine3D(const ParmLine3D &p, float t, Point3D &pt);
+		static void InitParmLine3D(const Vec3 &pInit, const Vec3 &pTerm, ParmLine3D &p);
+		static void ComputeParmLine3D(const ParmLine3D &p, float t, Vec3 &pt);
 
 		// 3d平面函数
-		static void Plane3DInit(Plane3D &plane, const Point3D &p0, const Vector3D &normal, bool normalize);
-		static float ComputePointInPlane3D(const Point3D &pt, const Plane3D &plane);
-		static int IntersectParmLinePlane3D(const ParmLine3D &line, Plane3D &plane, float &t, Point3D &pt);
+		static void Plane3DInit(Plane3D &plane, const Vec3 &p0, const Vec3 &normal, bool normalize);
+		static float ComputePointInPlane3D(const Vec3 &pt, const Plane3D &plane);
+		static int IntersectParmLinePlane3D(const ParmLine3D &line, Plane3D &plane, float &t, Vec3 &pt);
 
 		static float cos_look[361];
 		static float sin_look[361];

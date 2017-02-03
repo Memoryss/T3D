@@ -7,4 +7,6 @@ add_library(T3D
 	T3DMesh.cpp
 	T3DUtil.h
 	T3DUtil.cpp
+	T3DCamera.h
+	T3DCamera.cpp
 )

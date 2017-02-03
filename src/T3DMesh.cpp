@@ -7,7 +7,7 @@ namespace T3D {
 
 	char * PLGLoader::GetLinePLG(char *buffer, int maxlength, FILE * fp)
 	{
-		int index = 0;
+		size_t index = 0;
 		int length = 0;
 
 		while (true)
@@ -28,7 +28,7 @@ namespace T3D {
 		}
 	}
 
-	int PLGLoader::LoadObjectPLG(Object *obj, const char *filename, const Vector4D &scale, const Vector4D &pos, const Vector4D &rot)
+	int PLGLoader::LoadObjectPLG(Object *obj, const char *filename, const Vec4 &scale, const Vec4 &pos, const Vec4 &rot)
 	{
 		FILE *fp;
 
@@ -76,7 +76,7 @@ namespace T3D {
 			}
 
 			//分析顶点
-			Point4D point;
+			Vec4 point;
 			sscanf(token_string, "%f %f %f", &point.m_x, &point.m_y, &point.m_z);
 			point.m_w = 1;
 
@@ -202,7 +202,7 @@ namespace T3D {
 		m_avg_radius = 0;
 		m_max_radisus = 0;
 
-		for (int i = 0; i < m_vlist_local.size(); ++i)
+		for (size_t i = 0; i < m_vlist_local.size(); ++i)
 		{
 			float dist_to_vertex = sqrt(m_vlist_local[i].m_x * m_vlist_local[i].m_x + m_vlist_local[i].m_y * m_vlist_local[i].m_y + m_vlist_local[i].m_z * m_vlist_local[i].m_z);
 
@@ -215,12 +215,93 @@ namespace T3D {
 		return m_max_radisus;
 	}
 
+	void Object::Transform(const Matrix44 & mt, int coord_select, int transform_basis)
+	{
+		switch (coord_select)
+		{
+		case TRANSFORM_LOCAL_ONLY:
+			for (size_t vertex = 0; vertex < m_vlist_local.size(); ++vertex)
+			{
+				Vec4 presult; //用于暂时存储变换的结果
+				CommonMath::V4dMulMat44(m_vlist_local[vertex], mt, presult);
+				m_vlist_local[vertex].InitWithVec4(presult); //将结果存回去
+			}
+			break;
+		case TRANSFORM_TRANS_ONLY:
+			for (size_t vertex = 0; vertex < m_vlist_trans.size(); ++vertex)
+			{
+				Vec4 presult; 
+				CommonMath::V4dMulMat44(m_vlist_trans[vertex], mt, presult);
+				m_vlist_trans[vertex].InitWithVec4(presult);
+			}
+			break;
+		case TRANSFORM_LOCAL_TO_TRANS:
+			for (size_t vertex = 0; vertex < m_vlist_local.size(); ++vertex)
+			{
+				CommonMath::V4dMulMat44(m_vlist_local[vertex], mt, m_vlist_trans[vertex]);
+			}
+			break;
+		default:
+			break;
+		}
+
+		//朝向向量变化
+		if (transform_basis)
+		{
+			Vec4 vresult;
+
+			//x
+			CommonMath::V4dMulMat44(m_ux, mt, vresult);
+			m_ux.InitWithVec4(vresult);
+
+			//y
+			CommonMath::V4dMulMat44(m_uy, mt, vresult);
+			m_uy.InitWithVec4(vresult);
+
+			//z
+			CommonMath::V4dMulMat44(m_uz, mt, vresult);
+			m_uz.InitWithVec4(vresult);
+		}
+	}
+
+	void Object::ModelToWorld(int coord_select)
+	{
+		if (coord_select == TRANSFORM_LOCAL_TO_TRANS)
+		{
+			for (size_t vertex = 0; vertex < m_vlist_local.size(); ++vertex)
+			{
+				CommonMath::Vec4Add(m_vlist_local[vertex], m_world_pos, m_vlist_trans[vertex]);
+			}
+		}
+		else  //TRANSFORM_TRANS_ONLY
+		{
+			for (size_t vertex = 0; vertex < m_vlist_local.size(); ++vertex)
+			{
+				CommonMath::Vec4Add(m_vlist_trans[vertex], m_world_pos, m_vlist_trans[vertex]);
+			}
+		}
+	}
+
+	void Object::BuildModelToWorldMat44(Matrix44 & mt)
+	{
+		mt.InitZero();
+		mt.m_mat[0][0] = 1;
+		mt.m_mat[1][1] = 1;
+		mt.m_mat[2][2] = 1;
+		mt.m_mat[3][3] = 1;
+		mt.m_mat[3][0] = m_world_pos.m_x;
+		mt.m_mat[3][1] = m_world_pos.m_y;
+		mt.m_mat[3][2] = m_world_pos.m_z;
+	}
+
 	void RenderList::TransForm(const Matrix44 & mt, int coord_select)
 	{
 		switch (coord_select)
 		{
 		case TRANSFORM_LOCAL_ONLY:
-			for (int poly = 0; poly < m_facePtrs.size(); ++poly)
+			//for循环应该放在外面好点，但是switch次数就变得多了 可能会影响效率
+			//对局部坐标进行变化
+			for (size_t poly = 0; poly < m_facePtrs.size(); ++poly)
 			{
 				TriangleFace *face = m_facePtrs[poly];
 				//判断多边形是否存在，是否有效
@@ -233,18 +314,95 @@ namespace T3D {
 				//如果满足条件，进行变化
 				for (int vertex = 0; vertex < 3; ++vertex)
 				{
-					Point4D presult;  //用于暂时存储变化的结果
-					CommonMath::V4dMulMat44(face->m_vlist[vertex])
+					Vec4 presult;  //用于暂时存储变化的结果
+					CommonMath::V4dMulMat44(face->m_vlist[vertex], mt, presult);
+					face->m_vlist[vertex].InitWithVec4(presult); //存回去
 				}
 			}
 			break;
 		case TRANSFORM_TRANS_ONLY:
+			//对渲染列表中变化后的顶点进行变换
+			// tvlist用于存储累积变化的结果
+			for (size_t poly = 0; poly < m_facePtrs.size(); ++poly)
+			{
+				TriangleFace *face = m_facePtrs[poly];
+				if (face == NULL || !(face->m_state & POLY4DV1_STATE_ACTIVE) || face->m_state & POLY4DV1_STATE_BACKFACE || face->m_state & POLY4DV1_STATE_CLIPPED)
+				{
+					continue;
+				}
+
+				for (int vertex = 0; vertex < 3; ++vertex)
+				{
+					Vec4 presult;  //用于暂时存储变化的结果
+					CommonMath::V4dMulMat44(face->m_tvlist[vertex], mt, presult);
+					face->m_tvlist[vertex].InitWithVec4(presult); //存回去
+				}
+
+			}
 			break;
 		case TRANSFORM_LOCAL_TO_TRANS:
+			//对渲染列表中的局部、模型顶点列表进行变化
+			//并将结果存储到变换后的顶点列表中
+			for (size_t poly = 0; poly < m_facePtrs.size(); ++poly)
+			{
+				TriangleFace *face = m_facePtrs[poly];
+				if (face == NULL || !(face->m_state & POLY4DV1_STATE_ACTIVE) || face->m_state & POLY4DV1_STATE_BACKFACE || face->m_state & POLY4DV1_STATE_CLIPPED)
+				{
+					continue;
+				}
+
+				for (int vertex = 0; vertex < 3; ++vertex)
+				{
+					CommonMath::V4dMulMat44(face->m_vlist[vertex], mt, face->m_vlist[vertex]);
+				}
+
+			}
 			break;
 		default:
 			break;
 		}
+	}
+
+	void RenderList::ModelToWorld(Vec4 world_pos, int coord_select)
+	{
+		if (coord_select == TRANSFORM_LOCAL_TO_TRANS)
+		{
+			for (size_t poly = 0; poly < m_facePtrs.size(); ++poly)
+			{
+				TriangleFace *face = m_facePtrs[poly];
+				if (face == NULL || face->m_state != POLY4DV1_STATE_ACTIVE || face->m_state == POLY4DV1_STATE_BACKFACE || face->m_state == POLY4DV1_STATE_CLIPPED) continue;
+
+				for (int vertex = 0; vertex < 3; ++vertex)
+				{
+					CommonMath::Vec4Add(face->m_vlist[vertex], world_pos, face->m_tvlist[vertex]);
+				}
+			}
+		}
+		else // TRANSFORM_TRANS_ONLY
+		{
+			for (size_t poly = 0; poly < m_facePtrs.size(); ++poly)
+			{
+				TriangleFace *face = m_facePtrs[poly];
+				if (face == NULL || face->m_state != POLY4DV1_STATE_ACTIVE || face->m_state == POLY4DV1_STATE_BACKFACE || face->m_state == POLY4DV1_STATE_CLIPPED) continue;
+
+				for (int vertex = 0; vertex < 3; ++vertex)
+				{
+					CommonMath::Vec4Add(face->m_tvlist[vertex], world_pos, face->m_tvlist[vertex]);
+				}
+			}
+		}
+	}
+
+	void RenderList::BuildModelToWorldMat44(Vec4 world_pos, Matrix44 & mt)
+	{
+		mt.InitZero();
+		mt.m_mat[0][0] = 1;
+		mt.m_mat[1][1] = 1;
+		mt.m_mat[2][2] = 1;
+		mt.m_mat[3][3] = 1;
+		mt.m_mat[3][0] = world_pos.m_x;
+		mt.m_mat[3][1] = world_pos.m_y;
+		mt.m_mat[3][2] = world_pos.m_z;
 	}
 	
 } //T3D

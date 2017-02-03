@@ -1,5 +1,5 @@
-#ifndef __T3DLOG_H__
-#define __T3DLOG_H__
+#ifndef __T3D_LOG_H__
+#define __T3D_LOG_H__
 
 #include <string>
 
