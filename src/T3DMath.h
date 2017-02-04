@@ -27,7 +27,7 @@ namespace T3D {
 		}
 	};
 
-	//不包含齐次坐标的w分量
+	//不包含齐次坐标的w分量  即可以表示向量又可以表示点
 	struct Vec3
 	{
 		float m_x;
@@ -99,6 +99,7 @@ namespace T3D {
 		Vec3 m_vec;
 	};
 
+	//平面 面上的点和法线
 	struct Plane3D
 	{
 		Vec3 m_p0;

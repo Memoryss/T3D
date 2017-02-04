@@ -36,5 +36,54 @@ T3D::Camera::Camera(int cam_attr, Vec4 cam_pos, Vec4 cam_dir, Vec4 cam_target, f
 
 	//根据fov和视平面的大小计算视距、
 	float tan_for_div2 = tanf(DEG_TO_RAN(fov / 2));
-	m_view_dist = (0.5) 
-}
+	m_view_dist = (0.5) * m_viewplane_width / tan_for_div2;
+
+	//判断fov是否是90度
+	if (m_fov == 90.0f)
+	{
+		//建立裁剪面
+		Vec3 point;
+		point.InitZero();
+
+		Vec3 normal;  //normal to plane
+
+		//right plane
+		normal.InitXYZ(1.0f, 0.0f, -1.0f);   //x-z
+		CommonMath::Plane3DInit(m_rt_clip_plane, point, normal, 1);
+
+		//left plane
+		normal.InitXYZ(-1.0f, 0.0f, -1.0f);  //x-z
+		CommonMath::Plane3DInit(m_lt_clip_plane, point, normal, 1);
+
+		//top plane
+		normal.InitXYZ(0.0f, 1.0f, -1.0f); //y-z
+		CommonMath::Plane3DInit(m_tp_clip_plane, point, normal, 1);
+
+		//bottom plane
+		normal.InitXYZ(0.0f, -1.0f, -1.0f); //y-z
+		CommonMath::Plane3DInit(m_bt_clip_plane, point, normal, 1);
+	} // end if
+	else
+	{
+		Vec3 point;
+		point.InitZero();
+
+		Vec3 normal;
+
+		//right plane
+		normal.InitXYZ(1.0f, 0.0f, -tan_for_div2);  //x-z
+		CommonMath::Plane3DInit(m_rt_clip_plane, point, normal, 1);
+
+		//left plane
+		normal.InitXYZ(-1.0f, 0.0f, -tan_for_div2);  //x-z
+		CommonMath::Plane3DInit(m_lt_clip_plane, point, normal, 1);
+
+		//top plane
+		normal.InitXYZ(0.0f, 1.0f, -tan_for_div2); //y-z
+		CommonMath::Plane3DInit(m_tp_clip_plane, point, normal, 1);
+
+		//bottom plane
+		normal.InitXYZ(0.0f, -1.0f, -tan_for_div2); //y-z
+		CommonMath::Plane3DInit(m_bt_clip_plane, point, normal, 1);
+	} // end else
+} //end 
