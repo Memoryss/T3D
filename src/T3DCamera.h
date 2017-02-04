@@ -10,6 +10,10 @@ namespace T3D {
 	public:
 		Camera(int cam_attr, Vec4 cam_pos, Vec4 cam_dir, Vec4 cam_target, float near_clip_z, float far_clip_z, float fov, float viewport_width, float viewport_height);
 
+		//根据相机的位置和欧拉角度计算矩阵
+		//参数表示旋转的顺序  xyz xzy ...
+		void BuildCameraMatrixEuler(int cam_rot_seq);
+
 	private:
 
 		int m_state;

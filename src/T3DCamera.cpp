@@ -1,6 +1,6 @@
 #include "T3DCamera.h"
 
-#include <math.h>
+#include "T3DMath.h"
 
 T3D::Camera::Camera(int cam_attr, Vec4 cam_pos, Vec4 cam_dir, Vec4 cam_target, float near_clip_z, float far_clip_z, float fov, float viewport_width, float viewport_height)
 {
@@ -86,4 +86,56 @@ T3D::Camera::Camera(int cam_attr, Vec4 cam_pos, Vec4 cam_dir, Vec4 cam_target, f
 		normal.InitXYZ(0.0f, -1.0f, -tan_for_div2); //y-z
 		CommonMath::Plane3DInit(m_bt_clip_plane, point, normal, 1);
 	} // end else
-} //end 
+} //end construct
+
+void T3D::Camera::BuildCameraMatrixEuler(int cam_rot_seq)
+{
+	Matrix44 mt_inv, //translation inverse
+		mx_inv, //rotate x inverse
+		my_inv, //rotate y inverse
+		mz_inv, //rotate z inverse
+		mrot, //multiply x y z matrix
+		mtmp; //tmp matrix
+
+	//translation inverse
+	mt_inv.Identity(); //indentity matrix
+	mt_inv.m_mat[3][0] = -m_pos.m_x;
+	mt_inv.m_mat[3][1] = -m_pos.m_y;
+	mt_inv.m_mat[3][2] = -m_pos.m_z;
+
+	// rotate inverse
+	// 1. inverse matrix == transpose matrix
+	// 2. theta Negate
+	float theta_x = m_dir.m_x;
+	float theta_y = m_dir.m_y;
+	float theta_z = m_dir.m_z;
+
+	//computer cos(theta_x) and sin(theta_x)
+	float cos_theta = CommonMath::FastCos(theta_x);   //cos(x) = cos(-x)
+	float sin_theta = -CommonMath::FastSin(theta_x);   //sin(x) = -sin(-x)
+	mx_inv.Identity();
+	mx_inv.m_mat[1][1] = cos_theta;
+	mx_inv.m_mat[1][2] = sin_theta;
+	mx_inv.m_mat[2][1] = -sin_theta;
+	mx_inv.m_mat[2][2] = cos_theta;
+
+	//computer cos(theta_y) and sin(theta_y)
+	cos_theta = CommonMath::FastCos(theta_y);
+	sin_theta = -CommonMath::FastSin(theta_y);
+	my_inv.Identity();
+	my_inv.m_mat[0][0] = cos_theta;
+	my_inv.m_mat[0][1] = -sin_theta;
+	my_inv.m_mat[2][0] = sin_theta;
+	my_inv.m_mat[2][1] = cos_theta;
+
+	//computer cos(theta_z) and sin(theta_z)
+	cos_theta = CommonMath::FastCos(theta_z);
+	sin_theta = -CommonMath::FastSin(theta_z);
+	mz_inv.Identity();
+	mz_inv.m_mat[0][0] = cos_theta;
+	mz_inv.m_mat[0][1] = sin_theta;
+	mz_inv.m_mat[1][0] = -sin_theta;
+	mz_inv.m_mat[1][1] = cos_theta;
+
+
+} //end build
