@@ -137,5 +137,43 @@ void T3D::Camera::BuildCameraMatrixEuler(int cam_rot_seq)
 	mz_inv.m_mat[1][0] = -sin_theta;
 	mz_inv.m_mat[1][1] = cos_theta;
 
-
+	//multipy rotate matrix
+	switch (cam_rot_seq)
+	{
+	case CAM_ROT_SEQ_XYZ:
+		CommonMath::Mat44Mul(mx_inv, my_inv, mtmp);
+		CommonMath::Mat44Mul(mtmp, mz_inv, mrot);
+		break;
+	case CAM_ROT_SEQ_YXZ:
+		CommonMath::Mat44Mul(my_inv, mx_inv, mtmp);
+		CommonMath::Mat44Mul(mtmp, mz_inv, mrot);
+		break;
+	case CAM_ROT_SEQ_XZY:
+		CommonMath::Mat44Mul(mx_inv, mz_inv, mtmp);
+		CommonMath::Mat44Mul(mtmp, my_inv, mrot);
+		break;
+	case CAM_ROT_SEQ_YZX:
+		CommonMath::Mat44Mul(my_inv, mz_inv, mtmp);
+		CommonMath::Mat44Mul(mtmp, mx_inv, mrot);
+		break;
+	case CAM_ROT_SEQ_ZYX:
+		CommonMath::Mat44Mul(mz_inv, my_inv, mtmp);
+		CommonMath::Mat44Mul(mtmp, mx_inv, mrot);
+		break;
+	case CAM_ROT_SEQ_ZXY:
+		CommonMath::Mat44Mul(mz_inv, mx_inv, mtmp);
+		CommonMath::Mat44Mul(mtmp, my_inv, mrot);
+		break;
+	default:
+		break;
+	} //end switch
+	
+	// mt_inv * mrot -> mcam
+	CommonMath::Mat44Mul(mt_inv, mrot, m_cam);
 } //end build
+
+void T3D::Camera::BuildCameraMatrixUVN(int mode)
+{
+	//up v, target n, right u
+	// mode 1. UVN_MODE_SIMPLE 
+}

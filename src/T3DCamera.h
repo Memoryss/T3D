@@ -3,6 +3,14 @@
 
 #include "T3DMath.h"
 
+//define camera rotation sequences
+#define CAM_ROT_SEQ_XYZ 0
+#define CAM_ROT_SEQ_YXZ 1
+#define CAM_ROT_SEQ_XZY 2
+#define CAM_ROT_SEQ_YZX 3
+#define CAM_ROT_SEQ_ZYX 4
+#define CAM_ROT_SEQ_ZXY 5
+
 namespace T3D {
 
 	class Camera 
@@ -13,6 +21,9 @@ namespace T3D {
 		//根据相机的位置和欧拉角度计算矩阵
 		//参数表示旋转的顺序  xyz xzy ...
 		void BuildCameraMatrixEuler(int cam_rot_seq);
+
+		//根据相机的位置和uvn向量计算矩阵
+		void BuildCameraMatrixUVN(int mode);
 
 	private:
 
