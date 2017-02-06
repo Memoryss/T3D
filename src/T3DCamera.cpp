@@ -175,5 +175,18 @@ void T3D::Camera::BuildCameraMatrixEuler(int cam_rot_seq)
 void T3D::Camera::BuildCameraMatrixUVN(int mode)
 {
 	//up v, target n, right u
-	// mode 1. UVN_MODE_SIMPLE 
+	// mode 1. UVN_MODE_SIMPLE  simple mode ,just use target and pos
+	// mode 2. UVN_MODE_SPHERICAL 球面坐标模式，分量x和y作为观察向量的方位角和仰角
+
+	Matrix44 mt_inv, //translation inverse
+		mt_uvn,  //uvn inverse
+		mtmp; 
+
+	// cam pos create mt_inv
+	mt_inv.Identity();
+	mt_inv.m_mat[3][0] = -m_pos.m_x;
+	mt_inv.m_mat[3][1] = -m_pos.m_y;
+	mt_inv.m_mat[3][2] = -m_pos.m_z;
+
+
 }
