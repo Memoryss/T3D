@@ -294,6 +294,15 @@ namespace T3D {
 		mt.m_mat[3][2] = m_world_pos.m_z;
 	}
 
+	void Object::WorldToCamera(Matrix44 &mt)
+	{
+		for (size_t vertex = 0; vertex < m_vlist_trans.size(); ++vertex)
+		{
+			Vec4 presult;
+			CommonMath::V4dMulMat44(m_vlist_trans[vertex])
+		}
+	}
+
 	void RenderList::TransForm(const Matrix44 & mt, int coord_select)
 	{
 		switch (coord_select)

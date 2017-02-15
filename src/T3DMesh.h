@@ -111,6 +111,8 @@ namespace T3D {
 		void ModelToWorld(int coord_select = TRANSFORM_LOCAL_TO_TRANS);
 		//model到world的變化矩陣
 		void BuildModelToWorldMat44(Matrix44 &mt);
+		//world到camera
+		void WorldToCamera(Matrix44 &mt);
 	};
 	
 

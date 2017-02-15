@@ -11,7 +11,12 @@
 #define CAM_ROT_SEQ_ZYX 4
 #define CAM_ROT_SEQ_ZXY 5
 
+#define UVN_MODE_SIMPLE 0
+#define UVN_MODE_SPHERICAL 1
+
 namespace T3D {
+
+	// UVN 相机 n 注视向量， v 上方的向量， u 右方的向量
 
 	class Camera 
 	{
