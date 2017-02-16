@@ -294,12 +294,11 @@ namespace T3D {
 		mt.m_mat[3][2] = m_world_pos.m_z;
 	}
 
-	void Object::WorldToCamera(Matrix44 &mt)
+	void Object::WorldToCamera(const Camera &cam)
 	{
 		for (size_t vertex = 0; vertex < m_vlist_trans.size(); ++vertex)
 		{
-			Vec4 presult;
-			CommonMath::V4dMulMat44(m_vlist_trans[vertex])
+			CommonMath::V4dMulMat44(m_vlist_trans[vertex], cam.m_cam, m_vlist_trans[vertex]);
 		}
 	}
 
@@ -412,6 +411,18 @@ namespace T3D {
 		mt.m_mat[3][0] = world_pos.m_x;
 		mt.m_mat[3][1] = world_pos.m_y;
 		mt.m_mat[3][2] = world_pos.m_z;
+	}
+
+	void RenderList::WorldToCamera(const Camera &cam)
+	{
+		for (size_t vertex = 0; vertex < m_facePtrs.size(); ++vertex)
+		{
+			if (m_facePtrs[vertex] != NULL || !(m_facePtrs[vertex]->m_attr & POLY4DV1_STATE_ACTIVE) || )
+
+			CommonMath::V4dMulMat44(m_facePtrs[vertex]->m_tvlist[0], cam.m_cam, m_facePtrs[vertex]->m_tvlist[0]);
+			CommonMath::V4dMulMat44(m_facePtrs[vertex]->m_tvlist[1], cam.m_cam, m_facePtrs[vertex]->m_tvlist[1]);
+			CommonMath::V4dMulMat44(m_facePtrs[vertex]->m_tvlist[2], cam.m_cam, m_facePtrs[vertex]->m_tvlist[2]);
+		}
 	}
 	
 } //T3D

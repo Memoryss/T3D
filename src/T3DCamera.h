@@ -30,7 +30,7 @@ namespace T3D {
 		//根据相机的位置和uvn向量计算矩阵
 		void BuildCameraMatrixUVN(int mode);
 
-	private:
+	public:
 
 		int m_state;
 		int m_attr;  //CAM_MODEL_ELUER CAM_MODEL_UVN

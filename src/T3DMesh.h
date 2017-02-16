@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "T3DMath.h"
+#include "T3DCamera.h"
 
 /*
 	使用顺时针定点顺序（左手规则），表示面的外方向
@@ -112,7 +113,7 @@ namespace T3D {
 		//model到world的變化矩陣
 		void BuildModelToWorldMat44(Matrix44 &mt);
 		//world到camera
-		void WorldToCamera(Matrix44 &mt);
+		void WorldToCamera(const Camera &cam);
 	};
 	
 
@@ -137,6 +138,8 @@ namespace T3D {
 		void ModelToWorld(Vec4 world_pos, int coord_select = TRANSFORM_LOCAL_TO_TRANS);
 		//model到world的變化矩陣
 		void BuildModelToWorldMat44(Vec4 world_pos, Matrix44 &mt);
+		//world到camera
+		void WorldToCamera(const Camera &cam);
 	};
 
 	class PLGLoader
