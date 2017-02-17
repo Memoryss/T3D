@@ -302,6 +302,90 @@ namespace T3D {
 		}
 	}
 
+	int Object::Cull(const Camera &cam, int cull_flags)
+	{
+		Vec4 sphere_pos;
+		//转化到相机空间
+		CommonMath::V4dMulMat44(this->m_world_pos, cam.m_cam, sphere_pos);
+
+		//根据所选择的裁剪方式进行裁剪
+		if (cull_flags & CULL_OBJECT_Z_PLANE)
+		{
+			if (sphere_pos.m_z - this->m_max_radisus > cam.m_far_clip_z || sphere_pos.m_z + this->m_max_radisus < cam.m_near_clip_z)
+			{
+				SET_BIT(this->m_state, OBJECT_STATE_CULLED);
+				return 0;
+			}
+		}
+
+		if (cull_flags & CULL_OBJECT_X_PLANE)
+		{
+			float x_test = 0.5 * cam.m_viewport_width * sphere_pos.m_z / cam.m_view_dist;
+			if (sphere_pos.m_x - this->m_max_radisus > x_test || sphere_pos.m_x + this->m_max_radisus < -x_test)
+			{
+				SET_BIT(this->m_state, OBJECT_STATE_CULLED);
+				return 0;
+			}
+		}
+
+		if (cull_flags & CULL_OBJECT_Z_PLANE)
+		{
+			float y_test = 0.5 * cam.m_viewport_height * sphere_pos.m_z / cam.m_view_dist;
+			if (sphere_pos.m_y - this->m_max_radisus > y_test || sphere_pos.m_y + this->m_max_radisus - y_test)
+			{
+				SET_BIT(this->m_state, OBJECT_STATE_CULLED);
+				return 0;
+			}
+		}
+
+		return 1;
+	}// end cull object
+
+	void Object::Reset()
+	{
+		RESET_BIT(this->m_state, OBJECT_STATE_CULLED);  //取消culled标记
+		for (size_t vertex; vertex < this->m_plist.size(); ++vertex)
+		{
+			Triangle &face = this->m_plist[vertex];
+			//判断是否可见
+			if (!(face.m_state & POLY4DV1_STATE_ACTIVE)) continue;
+
+			RESET_BIT(face.m_state, POLY4DV1_STATE_BACKFACE);
+			RESET_BIT(face.m_state, POLY4DV1_STATE_CLIPPED);
+		} //END OF POLY
+	} // END object reset
+
+	void Object::RemoveBackfaces(const Camera &cam)
+	{
+		if (this->m_state & OBJECT_STATE_CULLED)
+			return;
+
+		for (size_t vertex; vertex < this->m_plist.size(); ++vertex)
+		{
+			Triangle &face = m_plist[vertex];
+			if (!(face.m_state & POLY4DV1_STATE_ACTIVE) || face.m_state & POLY4DV1_STATE_BACKFACE || face.m_state & POLY4DV1_STATE_CLIPPED)
+				continue;
+
+			int vertex_0 = face.m_vertices[0];
+			int vertex_1 = face.m_vertices[1];
+			int vertex_2 = face.m_vertices[2];
+
+			Vec4 u, v, n;
+			CommonMath::Vec4Build(face.m_vlist[vertex_0], face.m_vlist[vertex_1], u);
+			CommonMath::Vec4Build(face.m_vlist[vertex_1], face.m_vlist[vertex_2], v);
+			CommonMath::Vec4Cross(u, v, n);
+
+			Vec4 view;
+			CommonMath::Vec4Build(face.m_vlist[vertex_0], cam.m_pos, view);
+			
+			float dp = CommonMath::Vec4Dot(n, view);
+			if (dp < 0.0f) 
+			{
+				SET_BIT(face.m_state, POLY4DV1_STATE_BACKFACE);
+			}
+		}
+	}// END BACKFACE
+
 	void RenderList::TransForm(const Matrix44 & mt, int coord_select)
 	{
 		switch (coord_select)
@@ -417,7 +501,7 @@ namespace T3D {
 	{
 		for (size_t vertex = 0; vertex < m_facePtrs.size(); ++vertex)
 		{
-			if (m_facePtrs[vertex] != NULL || !(m_facePtrs[vertex]->m_attr & POLY4DV1_STATE_ACTIVE) || )
+			if (m_facePtrs[vertex] != NULL || !(m_facePtrs[vertex]->m_attr & POLY4DV1_STATE_ACTIVE) || m_facePtrs[vertex]->m_attr & POLY4DV1_STATE_CLIPPED || m_facePtrs[vertex]->m_attr & POLY4DV1_STATE_BACKFACE) continue;
 
 			CommonMath::V4dMulMat44(m_facePtrs[vertex]->m_tvlist[0], cam.m_cam, m_facePtrs[vertex]->m_tvlist[0]);
 			CommonMath::V4dMulMat44(m_facePtrs[vertex]->m_tvlist[1], cam.m_cam, m_facePtrs[vertex]->m_tvlist[1]);

@@ -58,6 +58,12 @@
 #define TRANSFORM_TRANS_ONLY 1
 #define TRANSFORM_LOCAL_TO_TRANS 2
 
+//裁剪标记
+#define CULL_OBJECT_X_PLANE 0X001
+#define CULL_OBJECT_Y_PLANE 0X002
+#define CULL_OBJECT_Z_PLANE 0X004
+#define CULL_OBJECT_XYZ_PLANES (CULL_OBJECT_X_PLANE | CULL_OBJECT_Y_PLANE | CULL_OBJECT_Z_PLANE)
+
 namespace T3D {
 
 	//三角形
@@ -114,6 +120,12 @@ namespace T3D {
 		void BuildModelToWorldMat44(Matrix44 &mt);
 		//world到camera
 		void WorldToCamera(const Camera &cam);
+		//裁剪
+		int Cull(const Camera &cam, int cull_flags);
+		//重置
+		void Reset();
+		//背面提出
+		void RemoveBackfaces(const Camera &cam);
 	};
 	
 

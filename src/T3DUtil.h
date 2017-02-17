@@ -2,6 +2,7 @@
 #define __T3D_UTIL_H__
 
 #define SET_BIT(word, bit_flag) word = (word | bit_flag)
+#define RESET_BIT(word, bit_flag) word = (word & (~bit_flag))
 
 typedef unsigned short UNSHORT;
 
