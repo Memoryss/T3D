@@ -5,6 +5,7 @@
 #define RESET_BIT(word, bit_flag) word = (word & (~bit_flag))
 
 typedef unsigned short UNSHORT;
+typedef unsigned char UCHAR;
 
 namespace T3D {
 	

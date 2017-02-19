@@ -240,5 +240,23 @@ namespace T3D {
 		CommonMath::Mat44Mul(mt_inv, mt_uvn, this->m_cam);
 	}// end BuildCameraMatrixUVN
 
+	void Camera::BuildPerspectiveMatrix(Matrix44 mat)
+	{
+		mat.Identity();
+		mat.m_mat[0][0] = m_view_dist;
+		mat.m_mat[1][1] = m_view_dist * m_aspect_ratio;
+		mat.m_mat[2][3] = 1; //w值为z  为了透视除法
+	}
 
+	void Camera::BuildScreenMatrix(Matrix44 mat)
+	{
+		float alpha = 0.5f * m_viewport_width - 0.5f;
+		float beta = 0.5f * m_viewport_height - 0.5f;
+
+		mat.Identity();
+		mat.m_mat[0][0] = alpha;
+		mat.m_mat[2][0] = alpha; //此時z值為1
+		mat.m_mat[1][1] = -beta;
+		mat.m_mat[2][1] = beta;
+	}
 }

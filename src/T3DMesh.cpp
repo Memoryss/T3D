@@ -344,7 +344,7 @@ namespace T3D {
 	void Object::Reset()
 	{
 		RESET_BIT(this->m_state, OBJECT_STATE_CULLED);  //取消culled标记
-		for (size_t vertex; vertex < this->m_plist.size(); ++vertex)
+		for (size_t vertex = 0; vertex < this->m_plist.size(); ++vertex)
 		{
 			Triangle &face = this->m_plist[vertex];
 			//判断是否可见
@@ -360,7 +360,7 @@ namespace T3D {
 		if (this->m_state & OBJECT_STATE_CULLED)
 			return;
 
-		for (size_t vertex; vertex < this->m_plist.size(); ++vertex)
+		for (size_t vertex = 0; vertex < this->m_plist.size(); ++vertex)
 		{
 			Triangle &face = m_plist[vertex];
 			if (!(face.m_state & POLY4DV1_STATE_ACTIVE) || face.m_state & POLY4DV1_STATE_BACKFACE || face.m_state & POLY4DV1_STATE_CLIPPED)
@@ -376,15 +376,68 @@ namespace T3D {
 			CommonMath::Vec4Cross(u, v, n);
 
 			Vec4 view;
+			//TODO 相反？？？
 			CommonMath::Vec4Build(face.m_vlist[vertex_0], cam.m_pos, view);
 			
 			float dp = CommonMath::Vec4Dot(n, view);
-			if (dp < 0.0f) 
+			if (dp <= 0.0f) 
 			{
 				SET_BIT(face.m_state, POLY4DV1_STATE_BACKFACE);
 			}
 		}
 	}// END BACKFACE
+
+	void Object::CameraToPerspective(const Camera &cam)
+	{
+		for (size_t vertex = 0; vertex < this->m_vlist_trans.size(); ++vertex)
+		{
+			float z = this->m_vlist_trans[vertex].m_z;
+
+			this->m_vlist_trans[vertex].m_x = this->m_vlist_trans[vertex].m_x * cam.m_view_dist / z;
+			this->m_vlist_trans[vertex].m_y = this->m_vlist_trans[vertex].m_y * cam.m_view_dist * cam.m_aspect_ratio / z;
+			this->m_vlist_trans[vertex].m_z = z;
+		}// end for vertex
+	} // end for CameraToPer
+
+	void Object::PerspectiveDivision()
+	{
+		for (size_t vertex = 0; vertex < this->m_vlist_trans.size(); ++vertex)
+		{
+			this->m_vlist_trans[vertex].m_x /= this->m_vlist_trans[vertex].m_w;
+			this->m_vlist_trans[vertex].m_y /= this->m_vlist_trans[vertex].m_w;
+			this->m_vlist_trans[vertex].m_z /= this->m_vlist_trans[vertex].m_w;
+		}
+	}
+
+	void Object::PerspectiveToScreen(const Camera &cam)
+	{
+		// 屏幕空間的坐標原點在左上角 向下為y正方向 和透視投影的y方向相反
+		float alpha = (0.5f * cam.m_viewport_width - 0.5f);
+		float beta = (0.5f * cam.m_viewport_height - 0.5f);
+
+		//假定頂點都被投影到-1 1之間
+		for (size_t vertex; vertex < m_vlist_trans.size(); ++vertex)
+		{
+			m_vlist_trans[vertex].m_x = (m_vlist_trans[vertex].m_x + 1) * alpha;
+			m_vlist_trans[vertex].m_y = (1 - m_vlist_trans[vertex].m_y) * beta;
+		} //end for vertex
+	} // end for perspectivetoscreen
+
+	void Object::DrawWire16(UCHAR *video_buffer, int lpitch)
+	{
+		for (size_t poly = 0; poly < m_plist.size(); ++poly)
+		{
+			if ((!m_plist[poly].m_state & POLY4DV1_STATE_ACTIVE) || m_plist[poly].m_state & POLY4DV1_STATE_CLIPPED || m_plist[poly].m_state & POLY4DV1_STATE_BACKFACE) continue;
+
+			int vindex_0 = m_plist[poly].m_vertices[0];
+			int vindex_1 = m_plist[poly].m_vertices[1];
+			int vindex_1 = m_plist[poly].m_vertices[2];
+
+
+		}
+	}
+
+
 
 	void RenderList::TransForm(const Matrix44 & mt, int coord_select)
 	{
@@ -499,14 +552,89 @@ namespace T3D {
 
 	void RenderList::WorldToCamera(const Camera &cam)
 	{
-		for (size_t vertex = 0; vertex < m_facePtrs.size(); ++vertex)
+		for (size_t poly = 0; poly < m_facePtrs.size(); ++poly)
 		{
-			if (m_facePtrs[vertex] != NULL || !(m_facePtrs[vertex]->m_attr & POLY4DV1_STATE_ACTIVE) || m_facePtrs[vertex]->m_attr & POLY4DV1_STATE_CLIPPED || m_facePtrs[vertex]->m_attr & POLY4DV1_STATE_BACKFACE) continue;
+			if (m_facePtrs[poly] != NULL || !(m_facePtrs[poly]->m_state & POLY4DV1_STATE_ACTIVE) || m_facePtrs[poly]->m_state & POLY4DV1_STATE_CLIPPED || m_facePtrs[poly]->m_state & POLY4DV1_STATE_BACKFACE) continue;
 
-			CommonMath::V4dMulMat44(m_facePtrs[vertex]->m_tvlist[0], cam.m_cam, m_facePtrs[vertex]->m_tvlist[0]);
-			CommonMath::V4dMulMat44(m_facePtrs[vertex]->m_tvlist[1], cam.m_cam, m_facePtrs[vertex]->m_tvlist[1]);
-			CommonMath::V4dMulMat44(m_facePtrs[vertex]->m_tvlist[2], cam.m_cam, m_facePtrs[vertex]->m_tvlist[2]);
+			CommonMath::V4dMulMat44(m_facePtrs[poly]->m_tvlist[0], cam.m_cam, m_facePtrs[poly]->m_tvlist[0]);
+			CommonMath::V4dMulMat44(m_facePtrs[poly]->m_tvlist[1], cam.m_cam, m_facePtrs[poly]->m_tvlist[1]);
+			CommonMath::V4dMulMat44(m_facePtrs[poly]->m_tvlist[2], cam.m_cam, m_facePtrs[poly]->m_tvlist[2]);
 		}
+	}
+
+	void RenderList::RemoveBackFace(const Camera &cam)
+	{
+		for (size_t poly = 0; poly < this->m_facePtrs.size(); ++poly)
+		{
+			TriangleFace *face = m_facePtrs[poly];
+			// 透明多边形不需要背面剔除
+			if (face != NULL || !(face->m_state & POLY4DV1_STATE_ACTIVE) || face->m_state & POLY4DV1_STATE_BACKFACE || face->m_state & POLY4DV1_STATE_CLIPPED || face->m_state & POLY4DV1_ATTR_2SIDED)
+				continue;
+
+			Vec4 u, v, n;
+			CommonMath::Vec4Build(face->m_tvlist[0], face->m_tvlist[1], u);
+			CommonMath::Vec4Build(face->m_tvlist[1], face->m_tvlist[2], v);
+			CommonMath::Vec4Cross(u, v, n);
+
+			Vec4 view;
+			//TODO 相反？？？
+			CommonMath::Vec4Build(face->m_tvlist[0], cam.m_pos, view);
+
+			float dp = CommonMath::Vec4Dot(n, view);
+			if (dp <= 0.0f)
+			{
+				SET_BIT(face->m_state, POLY4DV1_STATE_BACKFACE);
+			}
+		}
+	}
+
+	void RenderList::CameraToPerspective(const Camera &cam)
+	{
+		for (size_t poly = 0; poly < this->m_facePtrs.size(); ++poly)
+		{
+			TriangleFace *face = m_facePtrs[poly];
+			if (face == NULL || !(face->m_state & POLY4DV1_STATE_ACTIVE) || face->m_state & POLY4DV1_STATE_CLIPPED || face->m_state || POLY4DV1_STATE_BACKFACE) continue;
+
+			for (size_t vertex = 0; vertex < 3; ++vertex)
+			{
+				face->m_tvlist[vertex].m_x = face->m_tvlist[vertex].m_x * cam.m_view_dist / face->m_tvlist[vertex].m_z;
+				face->m_tvlist[vertex].m_y = face->m_tvlist[vertex].m_y * cam.m_view_dist * cam.m_aspect_ratio / face->m_tvlist[vertex].m_z;
+			} // end for vertex
+		} // end for face
+	} // end for CameraToPerspective
+
+	void RenderList::PerspectiveDivision()
+	{
+		for (size_t poly = 0; poly < m_facePtrs.size(); ++poly)
+		{
+			TriangleFace *face = m_facePtrs[poly];
+			if (face == NULL || !(face->m_state & POLY4DV1_STATE_ACTIVE) || face->m_state & POLY4DV1_STATE_CLIPPED || face->m_state & POLY4DV1_STATE_BACKFACE) continue;
+
+			for (size_t vertex; vertex < 3; ++vertex)
+			{
+				face->m_tvlist[vertex].m_x /= face->m_tvlist[vertex].m_w;
+				face->m_tvlist[vertex].m_y /= face->m_tvlist[vertex].m_w;
+				face->m_tvlist[vertex].m_w /= face->m_tvlist[vertex].m_w;
+			}// end for vertex
+		}//end for face
+	} // end for renderlist
+
+	void RenderList::PerspectiveToScreen(const Camera &cam)
+	{
+		float alpha = 0.5f * cam.m_viewport_width - 0.5f;
+		float beta = 0.5f * cam.m_viewport_height - 0.5f;
+
+		for (size_t poly = 0; poly < m_facePtrs.size(); ++poly)
+		{
+			TriangleFace *face = m_facePtrs[poly];
+			if (face == NULL || !(face->m_state & POLY4DV1_STATE_ACTIVE) || face->m_state & POLY4DV1_STATE_CLIPPED || face->m_state & POLY4DV1_STATE_BACKFACE) continue;
+
+			for (size_t vertex; vertex < 3; ++vertex)
+			{
+				face->m_tvlist[vertex].m_x = (face->m_tvlist[vertex].m_x + 1) * alpha;
+				face->m_tvlist[vertex].m_y = (1 - face->m_tvlist[vertex].m_y) * beta;
+			} // end for vertex
+		} // end for 
 	}
 	
 } //T3D

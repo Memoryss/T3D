@@ -124,8 +124,16 @@ namespace T3D {
 		int Cull(const Camera &cam, int cull_flags);
 		//重置
 		void Reset();
-		//背面提出
+		//背面剔除
 		void RemoveBackfaces(const Camera &cam);
+		//透视投影 非矩阵实现
+		void CameraToPerspective(const Camera &cam);
+		//透视除法 矩陣實現后需要調用該函數
+		void PerspectiveDivision();
+		//投影到屏幕
+		void PerspectiveToScreen(const Camera &cam);
+		//繪製線框
+		void DrawWire16(UCHAR *video_buffer, int lpitch);
 	};
 	
 
@@ -152,6 +160,14 @@ namespace T3D {
 		void BuildModelToWorldMat44(Vec4 world_pos, Matrix44 &mt);
 		//world到camera
 		void WorldToCamera(const Camera &cam);
+		//背面剔除
+		void RemoveBackFace(const Camera &cam);
+		//透视投影 非矩阵实现
+		void CameraToPerspective(const Camera &cam);
+		//透视除法 矩陣實現后需要調用該函數
+		void PerspectiveDivision();
+		//投影到屏幕
+		void PerspectiveToScreen(const Camera &cam);
 	};
 
 	class PLGLoader

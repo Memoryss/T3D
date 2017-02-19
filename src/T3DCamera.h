@@ -29,7 +29,10 @@ namespace T3D {
 
 		//根据相机的位置和uvn向量计算矩阵
 		void BuildCameraMatrixUVN(int mode);
-
+		//透視投影矩陣
+		void BuildPerspectiveMatrix(Matrix44 mat);
+		//投影到屏幕矩陣
+		void BuildScreenMatrix(Matrix44 mat);
 	public:
 
 		int m_state;
