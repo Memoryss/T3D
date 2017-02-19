@@ -13,6 +13,10 @@ namespace T3D {
 
 	UNSHORT RGB16Bit565(int r, int g, int b);
 	UNSHORT RGB16Bit555(int r, int g, int b);
+
+	//线段裁剪 参数 线段两个端点的x y坐标，矩形的左下角坐标和右上角坐标
+	//Cohen-Sutherland线段裁剪算法
+	int ClipLine(int &x1, int &y1, int &x2, int &y2, int rectx1, int recty1, int rectx2, int recty2);
 }
 
 #endif
