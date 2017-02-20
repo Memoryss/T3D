@@ -260,4 +260,45 @@ namespace T3D {
 		return 0;
 	} //end CLIP_LINE
 
+	int DrawLine(int x0, int y0, int x1, int y1, int color, UCHAR *vb_start, int lpitch)
+	{
+		int dx,  // 两点之间x的坐标差
+			dy,  // 两点之间y的坐标差
+			dx2, //dx * 2  为了判断是否在一条水平线或者垂直线上 两边之和大于第三边
+			dy2,
+			x_inc,  //移动到下一个x像素的间隔
+			y_inc,  //移动到下一个y像素的间隔
+			error,
+			index;
+
+		vb_start = vb_start + x0 + y0 * lpitch;  //计算p0点对应像素开始的位置
+
+		dx = x1 - x0;
+		dy = y1 - y0;
+
+		if (dx > 0)
+		{
+			x_inc = 1;
+		} //end move to right
+		else
+		{
+			x_inc = -1;
+			dx = -dx;
+		} //end move to left
+
+		if (dy > 0)
+		{
+			y_inc = lpitch;
+		} // end move to down
+		else
+		{
+			y_inc = -lpitch;
+			dy = -dy;
+		}
+
+		dx2 = dx << 1;
+		dy2 = dy << 1;
+	}
+
+
 }
