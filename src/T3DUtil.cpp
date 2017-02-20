@@ -58,6 +58,8 @@ namespace T3D {
 #define CLIP_CODE_NW 0x0009 
 #define CLIP_CODE_SW 0x0005
 
+		int xc1 = x1, yc1 = y1, xc2 = x2, yc2 = y2;
+
 		int p1_code = 0, p2_code = 0, temp = -1;
 		if (rectx1 < rectx2)
 		{
@@ -113,11 +115,43 @@ namespace T3D {
 			p2_code |= CLIP_CODE_S;
 		}
 
-		//在窗口一侧 或者 中央
-		if ((p1_code & p2_code) || (p1_code | p2_code))
-			return 1;
+		//在窗口内
+		if (p1_code == 0 && p2_code == 0)
+		{
+			return 0;
+		}
 
+		//在窗口外
+		if ((p1_code & p2_code))
+		{
+			return 1;
+		}
+			
 		switch (p1_code)
+		{
+		case CLIP_CODE_C:
+			break;
+		case CLIP_CODE_N:
+			yc1 = recty1;
+			xc1 = x1 + (recty1 - y1) * (x1 - x2) / (y1 - y2) + 0.5; //三角形相似  TODO 加上0.5干啥？
+			break;
+		case CLIP_CODE_S:
+			yc1 = recty2;
+			xc1 = x1 + (recty2 - y1) * (x1 - x2) / (y1 - y2) + 0.5;
+			break;
+		case CLIP_CODE_E:
+			xc1 = rectx2;
+			yc1 = y1 + (rectx2 - x1) * (y1 - y2) / (x1 - x2) + 0.5;
+			break;
+		case CLIP_CODE_W:
+			xc1 = rectx1;
+			yc1 = y1 + (rectx1 - x1) * (y1 - y2) / (x1 - x2) + 0.5;
+			break;
+		default:
+			break;
+		}
+
+		switch (switch_on)
 		{
 		default:
 			break;
