@@ -147,15 +147,117 @@ namespace T3D {
 			xc1 = rectx1;
 			yc1 = y1 + (rectx1 - x1) * (y1 - y2) / (x1 - x2) + 0.5;
 			break;
+		case CLIP_CODE_NE:  //先N如果不满足 则使用E
+			yc1 = recty1;
+			xc1 = x1 + (recty1 - y1) * (x1 - x2) / (y1 - y2) + 0.5;
+			if (xc1 < rectx1 || xc1 > rectx2)
+			{
+				xc1 = rectx2;
+				yc1 = y1 + (rectx2 - x1) * (y1 - y2) / (x1 - x2) + 0.5;
+			}
+			break;
+		case CLIP_CODE_SE:
+			yc1 = recty2;
+			xc1 = x1 + (recty2 - y1) * (x1 - x2) / (y1 - y2) + 0.5;
+			if (xc1 < rectx1 || xc1 > rectx2)
+			{
+				xc1 = rectx2;
+				yc1 = y1 + (rectx2 - x1) * (y1 - y2) / (x1 - x2) + 0.5;
+			}
+			break;
+		case CLIP_CODE_NW:
+			yc1 = recty1;
+			xc1 = x1 + (recty1 - y1) * (x1 - x2) / (y1 - y2) + 0.5;
+			if (xc1 < rectx1 || xc1 > rectx2)
+			{
+				xc1 = rectx1;
+				yc1 = y1 + (rectx1 - x1) * (y1 - y2) / (x1 - x2) + 0.5;
+			}
+			break;
+		case CLIP_CODE_SW:
+			yc1 = recty2;
+			xc1 = x1 + (recty2 - y1) * (x1 - x2) / (y1 - y2) + 0.5;
+			if (xc1 < rectx1 || xc1 > rectx2)
+			{
+				xc1 = rectx1;
+				yc1 = y1 + (rectx1 - x1) * (y1 - y2) / (x1 - x2) + 0.5;
+			}
+			break;
 		default:
 			break;
-		}
+		} //END FOR SWITCH p1_code
 
-		switch (switch_on)
+		switch (p2_code)
 		{
+		case CLIP_CODE_C:
+			break;
+		case CLIP_CODE_N:
+			yc2 = recty1;
+			xc2 = x2 + (recty1 - y2) * (y2 - y1) / (x2 - x1) + 0.5;
+			break;
+		case CLIP_CODE_S:
+			yc2 = recty2;
+			xc2 = x2 + (recty2 - y2) * (y2 - y1) / (x2 - x1) + 0.5;
+			break;
+		case CLIP_CODE_E:
+			xc2 = rectx2;
+			yc2 = y2 + (rectx2 - x2) * (y2 - y1) / (x2 - x1) + 0.5;
+			break;
+		case CLIP_CODE_W:
+			xc2 = rectx1;
+			yc2 = y2 + (rectx1 - x2) * (y2 - y1) / (x2 - x1) + 0.5;
+			break;
+		case CLIP_CODE_NE:
+			yc2 = recty1;
+			xc2 = x2 + (recty1 - y2) * (y2 - y1) / (x2 - x1) + 0.5;
+			if (xc2 < rectx1 || xc2 > rectx2)
+			{
+				xc2 = rectx2;
+				yc2 = y2 + (rectx2 - x2) * (y2 - y1) / (x2 - x1) + 0.5;
+			}
+			break;
+		case CLIP_CODE_SE:
+			yc2 = recty2;
+			xc2 = x2 + (recty2 - y2) * (y2 - y1) / (x2 - x1) + 0.5;
+			if (xc2 < rectx1 || xc2 > rectx2)
+			{
+				xc2 = rectx2;
+				yc2 = y2 + (rectx2 - x2) * (y2 - y1) / (x2 - x1) + 0.5;
+			}
+			break;
+		case CLIP_CODE_NW:
+			yc2 = recty1;
+			xc2 = x2 + (recty1 - y2) * (y2 - y1) / (x2 - x1) + 0.5;
+			if (xc2 < rectx1 || xc2 > rectx2)
+			{
+				xc2 = rectx1;
+				yc2 = y2 + (rectx1 - x2) * (y2 - y1) / (x2 - x1) + 0.5;
+			}
+			break;
+		case CLIP_CODE_SW:
+			yc2 = recty2;
+			xc2 = x2 + (recty2 - y2) * (y2 - y1) / (x2 - x1) + 0.5;
+			if (xc2 < rectx1 || xc2 > rectx2)
+			{
+				xc2 = rectx1;
+				yc2 = y2 + (rectx1 - x2) * (y2 - y1) / (x2 - x1) + 0.5;
+			}
+			break;
 		default:
 			break;
-		}
-	}
+		}//END SWITCH p2_code
+
+		if (xc1 < rectx1 || xc1 > rectx2 || yc1 < recty1 || yc1 > recty2 || xc2 < rectx1 || x2 > rectx2 || y2 < recty1 || y2 > recty2)
+		{
+			return 1;
+		} //end if
+
+		y1 = yc1;
+		x1 = xc1;
+		y2 = yc2;
+		x2 = xc2;
+
+		return 0;
+	} //end CLIP_LINE
 
 }
