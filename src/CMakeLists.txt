@@ -1,4 +1,4 @@
-add_library(T3D
+add_library(T3DEngine
 	T3DMath.h
 	T3DMath.cpp
 	T3DLog.h
