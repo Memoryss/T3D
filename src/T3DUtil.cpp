@@ -262,9 +262,16 @@ namespace T3D {
 
 	int DrawLine(int x0, int y0, int x1, int y1, int color, UCHAR *vb_start, int lpitch)
 	{
+		/************************************************************************/
+		/*                           Bresenham算法                                          
+			1.会计算直线坐标和像素格子之间的交点，判断交点的坐标和坐标轴距离的远近从而判断选用那个像素格子
+			2.算法实现使用直线斜率为0.5的作为分隔线，因为直线斜率为0.5的时候交点位于像素格子中间
+			3.算法实现完全采用整数，不使用除法，因此看起来逻辑有点问题，具体算法可看 Bresenham算法
+		*/
+		/************************************************************************/
 		int dx,  // 两点之间x的坐标差
 			dy,  // 两点之间y的坐标差
-			dx2, //dx * 2  为了判断是否在一条水平线或者垂直线上 两边之和大于第三边
+			dx2, //
 			dy2,
 			x_inc,  //移动到下一个x像素的间隔
 			y_inc,  //移动到下一个y像素的间隔
@@ -298,7 +305,48 @@ namespace T3D {
 
 		dx2 = dx << 1;
 		dy2 = dy << 1;
-	}
+
+		//判断以哪个坐标轴作为像素格子增长 因为dx > dy 所以 x+1时， y可能+0/+1
+		if (dx > dy)
+		{
+			error = dy2 - dx;
+
+			for (index = 0; index <= dx; ++index)
+			{
+				*vb_start = color;
+
+				if (error >= 0)
+				{
+					error -= dx2;
+					vb_start += y_inc;  //移到下一行
+				} // end for dx
+
+				error += dy2;
+
+				vb_start += x_inc;
+			}
+		} //end if
+		else 
+		{
+			error = dx2 - dy;
+			for (index = 0; index < dy; ++index)
+			{
+				*vb_start = color;
+
+				if (error > 0)
+				{
+					error -= dy2;
+					vb_start += x_inc;
+				}
+
+				error += dx2;
+
+				vb_start += y_inc;
+			} //end for dy
+		}// end else
+
+		return 0;
+	} // end draw line
 
 
 }
