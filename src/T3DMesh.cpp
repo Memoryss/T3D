@@ -423,7 +423,7 @@ namespace T3D {
 		} //end for vertex
 	} // end for perspectivetoscreen
 
-	void Object::DrawWire16(UCHAR *video_buffer, int lpitch)
+	void Object::DrawWire16(Camera &cam, UCHAR *video_buffer, int lpitch)
 	{
 		for (size_t poly = 0; poly < m_plist.size(); ++poly)
 		{
@@ -431,10 +431,15 @@ namespace T3D {
 
 			int vindex_0 = m_plist[poly].m_vertices[0];
 			int vindex_1 = m_plist[poly].m_vertices[1];
-			int vindex_1 = m_plist[poly].m_vertices[2];
+			int vindex_2 = m_plist[poly].m_vertices[2];
 
+			Rect rect;
+			cam.GetScreenRect(rect);
 
-		}
+			Draw_Clip_Line16(m_vlist_trans[vindex_0].m_x, m_vlist_trans[vindex_0].m_y, m_vlist_trans[vindex_1].m_x, m_vlist_trans[vindex_1].m_y, rect, m_plist[poly].m_color, video_buffer, lpitch);
+			Draw_Clip_Line16(m_vlist_trans[vindex_1].m_x, m_vlist_trans[vindex_1].m_y, m_vlist_trans[vindex_2].m_x, m_vlist_trans[vindex_2].m_y, rect, m_plist[poly].m_color, video_buffer, lpitch);
+			Draw_Clip_Line16(m_vlist_trans[vindex_2].m_x, m_vlist_trans[vindex_2].m_y, m_vlist_trans[vindex_0].m_x, m_vlist_trans[vindex_0].m_y, rect, m_plist[poly].m_color, video_buffer, lpitch);
+		}// end for poly
 	}
 
 
@@ -634,7 +639,18 @@ namespace T3D {
 				face->m_tvlist[vertex].m_x = (face->m_tvlist[vertex].m_x + 1) * alpha;
 				face->m_tvlist[vertex].m_y = (1 - face->m_tvlist[vertex].m_y) * beta;
 			} // end for vertex
-		} // end for 
+		} // end for poly
+	} //end PerspectiveToScreen
+
+	void RenderList::DrawWire16(const Camera &cam, UCHAR *video_buffer, int lpitch)
+	{
+		for (size_t poly; poly < m_facePtrs.size(); ++poly)
+		{
+			auto face = m_facePtrs[poly];
+			if (face == NULL || !(face->m_state == POLY4DV1_STATE_ACTIVE) || face->m_state == POLY4DV1_STATE_BACKFACE || face->m_state == POLY4DV1_STATE_CLIPPED) continue;
+
+			
+		}
 	}
 	
 } //T3D

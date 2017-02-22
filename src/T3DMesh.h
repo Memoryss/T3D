@@ -133,7 +133,7 @@ namespace T3D {
 		//投影到屏幕
 		void PerspectiveToScreen(const Camera &cam);
 		//繪製線框
-		void DrawWire16(UCHAR *video_buffer, int lpitch);
+		void DrawWire16(const Camera &cam, UCHAR *video_buffer, int lpitch);
 	};
 	
 
@@ -168,6 +168,8 @@ namespace T3D {
 		void PerspectiveDivision();
 		//投影到屏幕
 		void PerspectiveToScreen(const Camera &cam);
+		//绘制线框
+		void DrawWire16(Camera &cam, UCHAR *video_buffer, int lptch);
 	};
 
 	class PLGLoader

@@ -259,4 +259,12 @@ namespace T3D {
 		mat.m_mat[1][1] = -beta;
 		mat.m_mat[2][1] = beta;
 	}
+
+	void Camera::GetScreenRect(Rect &rect)
+	{
+		rect.m_width = m_viewport_width;
+		rect.m_height = m_viewport_height;
+		rect.m_x = m_viewport_center_x - 0.5 * rect.m_width;
+		rect.m_y = m_viewport_center_y - 0.5 * rect.m_height;
+	}
 }

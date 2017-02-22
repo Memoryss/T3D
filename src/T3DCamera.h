@@ -2,6 +2,7 @@
 #define __T3D_CAMERA_H__
 
 #include "T3DMath.h"
+#include "T3DUtil.h"
 
 //define camera rotation sequences
 #define CAM_ROT_SEQ_XYZ 0
@@ -33,6 +34,9 @@ namespace T3D {
 		void BuildPerspectiveMatrix(Matrix44 mat);
 		//投影到屏幕矩陣
 		void BuildScreenMatrix(Matrix44 mat);
+
+		//或得屏幕矩形
+		void GetScreenRect(Rect &rect);
 	public:
 
 		int m_state;
