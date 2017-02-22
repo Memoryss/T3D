@@ -31,7 +31,7 @@ namespace T3D {
 		return x;
 	}
 
-	int ClipLine(int &x1, int &y1, int &x2, int &y2, int rectx1, int recty1, int rectx2, int recty2)
+	int ClipLine(int &x1, int &y1, int &x2, int &y2, const Rect &rect)
 	{
 		/**********
 			À„∑®£∫
@@ -59,6 +59,10 @@ namespace T3D {
 #define CLIP_CODE_SW 0x0005
 
 		int xc1 = x1, yc1 = y1, xc2 = x2, yc2 = y2;
+		int rectx1 = rect.m_x;
+		int rectx2 = rect.m_x + rect.m_width;
+		int recty1 = rect.m_y;
+		int recty2 = rect.m_y + rect.m_height;
 
 		int p1_code = 0, p2_code = 0, temp = -1;
 		if (rectx1 < rectx2)
@@ -348,5 +352,13 @@ namespace T3D {
 		return 0;
 	} // end draw line
 
+	int Draw_Clip_Line16(int x0, int y0, int x1, int y1, const Rect &rect, int color, UCHAR *vb_start, int lpith)
+	{
+		if (ClipLine(x0, y0, x1, y1, rect) == 0)
+		{
+			DrawLine(x0, y0, x1, y1, color, vb_start, lpith);
+		}
 
+		return 0;
+	}
 }
