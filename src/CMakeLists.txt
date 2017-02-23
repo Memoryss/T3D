@@ -9,4 +9,8 @@ add_library(T3DEngine
 	T3DUtil.cpp
 	T3DCamera.h
 	T3DCamera.cpp
+	T3DDevice.h
+	T3DDevice.cpp
+	T3DWindow.h
+	T3DWindow.cpp
 )

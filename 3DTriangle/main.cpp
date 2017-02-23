@@ -1,6 +1,7 @@
 #define WIN32_LEAN_AND_MEAN  //去除无用的头文件，加快编译速度
 
 #include <Windows.h>
+#include <WinUser.h>
 
 #define WINDOW_CLASS_NAME "WIN3DCLASS"
 #define WINDOW_TITLE "3DTriangle"
@@ -10,6 +11,12 @@
 //全局变量
 HWND main_window_handle;
 HINSTANCE main_instance;
+
+//游戏初始化
+void GameInit()
+{
+
+}
 
 //窗口处理函数
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
@@ -79,5 +86,10 @@ int WINAPI WinMain(HINSTANCE hinstance, HINSTANCE hprevinstance, LPSTR lpcmdstr,
 
 	//窗口重新设置下
 	RECT window_rect = { 0, 0, WINDOW_WIDTH - 1, WINDOW_HEIGHT - 1 };
-	AdjustWindowRect(&window_rect, GetWindowStyle(main_window_handle))
+	AdjustWindowRectEx(&window_rect, GetWindowLong(main_window_handle, GWL_STYLE), GetMenu(main_window_handle) != NULL, GetWindowLong(main_window_handle, GWL_EXSTYLE));
+
+	MoveWindow(main_window_handle, 0, 0, window_rect.left - window_rect.right, window_rect.bottom - window_rect.top, false);
+	ShowWindow(main_window_handle, SW_SHOW);
+
+
 }
