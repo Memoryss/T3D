@@ -16,6 +16,10 @@ namespace T3D {
 		//关闭HDC和窗口等
 		void Close();
 
+		void Update();
+	private:
+		void dispatch();
+
 	private:
 		HWND m_handle; //窗口句柄
 		HDC m_hdc; //设备上下文

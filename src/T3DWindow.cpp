@@ -75,9 +75,24 @@ namespace T3D {
 
 		//创建应用程序可以直接写入的，与设备无关的位图
 		m_hb = CreateDIBSection(m_hdc, &bi, DIB_RGB_COLORS, m_framebuffer, 0, 0);
-		if (m_ob == NULL) return false;
-
+		if (m_hb == NULL) return false;
 		m_ob = (HBITMAP)SelectObject(m_hdc, m_hb);
+
+		//调整窗口大小
+		AdjustWindowRect(&rect, GetWindowLong(m_handle, GWL_STYLE), 0);
+		int wx = rect.right - rect.left;
+		int wy = rect.bottom - rect.top;
+		int sx = (GetSystemMetrics(SM_CXSCREEN) - wx) / 2; //是窗口位置位于中央
+		int sy = (GetSystemMetrics(SM_CYSCREEN) - wy) / 2;
+		if (sy < 0) sy = 0;
+
+		SetWindowPos(m_handle, NULL, sx, sy, wx, wy, (SWP_NOCOPYBITS | SWP_NOZORDER | SWP_SHOWWINDOW));
+		SetForegroundWindow(m_handle); //设置优先权较高
+
+		ShowWindow(m_handle, SW_NORMAL);
+		dispatch();
+
+		memset(m_framebuffer, 0, m_width * m_height * 4);
 
 		return true;
 	}
@@ -107,5 +122,27 @@ namespace T3D {
 			CloseWindow(m_handle);
 			m_handle = NULL;
 		}
+	}
+
+	void Window::dispatch()
+	{
+		MSG msg;
+		while (true)
+		{
+			if (!PeekMessage(&msg, NULL, 0, 0, PM_NOREMOVE)) break;
+			if (!GetMessage(&msg, NULL, 0, 0)) break;
+			DispatchMessage(&msg);
+		}
+	}
+
+	void Window::Update()
+	{
+		HDC hdc = GetDC(m_handle);
+		//对源设备环境进行像素转换
+		// SRCCOPY 将源矩形区域直接拷贝到目标矩形区域。
+		BitBlt(hdc, 0, 0, m_width, m_height, m_hdc, 0, 0, SRCCOPY); 
+		ReleaseDC(m_handle, hdc);
+
+		dispatch();
 	}
 }
