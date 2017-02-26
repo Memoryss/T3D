@@ -53,13 +53,11 @@ int WINAPI WinMain(HINSTANCE hinstance, HINSTANCE hprevinstance, LPSTR lpcmdstr,
 	object->WorldToCamera(*cam);
 	object->CameraToPerspective(*cam);
 	object->PerspectiveToScreen(*cam);
-	object->DrawWire16(*cam, framebuffer, 600);
 
 	while (!window->IsExit()) 
 	{
 		device->Clear();
-		window->Dispatch();
-		object->DrawWire16(*cam, framebuffer, 600);
+		object->DrawWire16(*cam, framebuffer, 800);
 		window->Update();
 	}
 

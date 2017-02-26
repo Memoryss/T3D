@@ -209,7 +209,8 @@ namespace T3D {
 			this->m_target.m_z = 1 * sin_phi * cos_theta;
 		} //end else
 
-		// n = <target - pos>  计算n
+		//TODO 当pos 和 target 一样时
+		// n = <target - pos>  计算n 
 		CommonMath::Vec4Build(this->m_pos, this->m_target, this->m_n);
 
 		// v  假定 0 1 0
