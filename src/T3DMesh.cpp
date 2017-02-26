@@ -12,16 +12,19 @@ namespace T3D {
 
 		while (true)
 		{
-			if (!fgets(buffer, maxlength, fp)) return NULL;
+			if (!fgets(buffer, maxlength, fp))
+			{
+				return NULL;
+			}
 
 			//计算空格数
-			for (; index < strlen(buffer); ++index)
+			for (length = strlen(buffer), index = 0; index < strlen(buffer); ++index)
 			{
-				if (!strcmp(buffer + index, " ")) break;
+				if (buffer[index] != ' ') break;
 			}
 
 			//整行空格或者注释
-			if (index == strlen(buffer) || strcmp(buffer + index, "#")) continue;
+			if (index >= strlen(buffer) || buffer[index] == '#' || buffer[index] == '\n') continue;
 
 			//返回 数据
 			return buffer + index;
@@ -111,16 +114,18 @@ namespace T3D {
 			Log::WriteError("Polypon %d:\n", poly);
 
 			Triangle triangle;
-			sscanf(token_string, "%s %d %f %f %f", tmp_string, &poly_num_verts, &triangle.m_vertices[0], &triangle.m_vertices[1], &triangle.m_vertices[2]);
+			sscanf(token_string, "%s %d %d %d %d", tmp_string, &poly_num_verts, &triangle.m_vertices[0], &triangle.m_vertices[1], &triangle.m_vertices[2]);
 			
 			//描述符可能是16进制 需要判断
-			if (tmp_string[0] == '0' && tmp_string[1] == 'X')  //十六进制
+			if (tmp_string[0] == '0' && tmp_string[1] == 'x')  //十六进制
 				sscanf(tmp_string, "%x", &poly_surface_desc);
 			else
 				poly_surface_desc = atoi(tmp_string);
 
 			triangle.m_vlist = &obj->m_vlist_local[0];
-			Log::WriteError("Surface Desc = 0x%.4x, num_verts = %d, vert_indices[%d, %d, %d]", poly_surface_desc, poly_num_verts, triangle.m_vertices[0], triangle.m_vertices[1], triangle.m_vertices[3]);
+			Log::WriteError("Surface Desc = 0x%.4x, num_verts = %d, vert_indices[%d, %d, %d]", poly_surface_desc, poly_num_verts, triangle.m_vertices[0], triangle.m_vertices[1], triangle.m_vertices[2]);
+
+			obj->m_plist.push_back(triangle);  //添加多边形
 
 			//分析多边形描述符
 			//提取多边形的的每个位字段
@@ -147,7 +152,7 @@ namespace T3D {
 
 				//文件中 rgb颜色值总是4.4.4格式，图形卡中rgb颜色5.5.5或者5.6.5
 				//因此需要将4.4.4的rgb值转换为8.8.8
-				obj->m_plist[poly].m_color = RGB16Bit(red, green, blue);
+				obj->m_plist[poly].m_color = RGB16Bit565(red, green, blue);
 				Log::WriteError("RGB Color = [%d, %d, %d]\n", red, green, blue);
 			}
 			else
@@ -196,6 +201,11 @@ namespace T3D {
 		fclose(fp);
 		return 0;
 	}//end of load plg
+
+	void Object::SetPos(const Vec4 &pos)
+	{
+		m_world_pos = pos;
+	}
 
 	int Object::ComputeRadius()
 	{
@@ -320,7 +330,7 @@ namespace T3D {
 
 		if (cull_flags & CULL_OBJECT_X_PLANE)
 		{
-			float x_test = 0.5 * cam.m_viewport_width * sphere_pos.m_z / cam.m_view_dist;
+			float x_test = 0.5 * cam.GetViewPort().m_width * sphere_pos.m_z / cam.m_view_dist;
 			if (sphere_pos.m_x - this->m_max_radisus > x_test || sphere_pos.m_x + this->m_max_radisus < -x_test)
 			{
 				SET_BIT(this->m_state, OBJECT_STATE_CULLED);
@@ -330,7 +340,7 @@ namespace T3D {
 
 		if (cull_flags & CULL_OBJECT_Z_PLANE)
 		{
-			float y_test = 0.5 * cam.m_viewport_height * sphere_pos.m_z / cam.m_view_dist;
+			float y_test = 0.5 * cam.GetViewPort().m_height * sphere_pos.m_z / cam.m_view_dist;
 			if (sphere_pos.m_y - this->m_max_radisus > y_test || sphere_pos.m_y + this->m_max_radisus - y_test)
 			{
 				SET_BIT(this->m_state, OBJECT_STATE_CULLED);
@@ -412,18 +422,18 @@ namespace T3D {
 	void Object::PerspectiveToScreen(const Camera &cam)
 	{
 		// 屏幕空間的坐標原點在左上角 向下為y正方向 和透視投影的y方向相反
-		float alpha = (0.5f * cam.m_viewport_width - 0.5f);
-		float beta = (0.5f * cam.m_viewport_height - 0.5f);
+		float alpha = (0.5f * cam.GetViewPort().m_width - 0.5f);
+		float beta = (0.5f * cam.GetViewPort().m_height - 0.5f);
 
 		//假定頂點都被投影到-1 1之間
-		for (size_t vertex; vertex < m_vlist_trans.size(); ++vertex)
+		for (size_t vertex = 0; vertex < m_vlist_trans.size(); ++vertex)
 		{
 			m_vlist_trans[vertex].m_x = (m_vlist_trans[vertex].m_x + 1) * alpha;
 			m_vlist_trans[vertex].m_y = (1 - m_vlist_trans[vertex].m_y) * beta;
 		} //end for vertex
 	} // end for perspectivetoscreen
 
-	void Object::DrawWire16(Camera &cam, UCHAR *video_buffer, int lpitch)
+	void Object::DrawWire16(const Camera &cam, unsigned int *video_buffer, int lpitch)
 	{
 		for (size_t poly = 0; poly < m_plist.size(); ++poly)
 		{
@@ -433,8 +443,13 @@ namespace T3D {
 			int vindex_1 = m_plist[poly].m_vertices[1];
 			int vindex_2 = m_plist[poly].m_vertices[2];
 
+			const ViewPort &vp = cam.GetViewPort();
+
 			Rect rect;
-			cam.GetScreenRect(rect);
+			rect.m_x = vp.m_x;
+			rect.m_y = vp.m_y;
+			rect.m_width = vp.m_width;
+			rect.m_height = vp.m_height;
 
 			Draw_Clip_Line16(m_vlist_trans[vindex_0].m_x, m_vlist_trans[vindex_0].m_y, m_vlist_trans[vindex_1].m_x, m_vlist_trans[vindex_1].m_y, rect, m_plist[poly].m_color, video_buffer, lpitch);
 			Draw_Clip_Line16(m_vlist_trans[vindex_1].m_x, m_vlist_trans[vindex_1].m_y, m_vlist_trans[vindex_2].m_x, m_vlist_trans[vindex_2].m_y, rect, m_plist[poly].m_color, video_buffer, lpitch);
@@ -442,7 +457,13 @@ namespace T3D {
 		}// end for poly
 	}
 
-
+	void Object::SynchroVertex()
+	{
+		for (size_t vertex = 0; vertex < m_vlist_local.size(); ++vertex)
+		{
+			m_vlist_trans.push_back(m_vlist_local[vertex]);
+		}
+	}
 
 	void RenderList::TransForm(const Matrix44 & mt, int coord_select)
 	{
@@ -626,8 +647,8 @@ namespace T3D {
 
 	void RenderList::PerspectiveToScreen(const Camera &cam)
 	{
-		float alpha = 0.5f * cam.m_viewport_width - 0.5f;
-		float beta = 0.5f * cam.m_viewport_height - 0.5f;
+		float alpha = 0.5f * cam.GetViewPort().m_width - 0.5f;
+		float beta = 0.5f * cam.GetViewPort().m_height - 0.5f;
 
 		for (size_t poly = 0; poly < m_facePtrs.size(); ++poly)
 		{
@@ -642,7 +663,7 @@ namespace T3D {
 		} // end for poly
 	} //end PerspectiveToScreen
 
-	void RenderList::DrawWire16(const Camera &cam, UCHAR *video_buffer, int lpitch)
+	void RenderList::DrawWire16(const Camera &cam, unsigned int *video_buffer, int lpitch)
 	{
 		for (size_t poly; poly < m_facePtrs.size(); ++poly)
 		{

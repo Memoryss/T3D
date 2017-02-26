@@ -2,9 +2,11 @@
 
 #include "T3DMath.h"
 
+#include <math.h>
+
 namespace T3D {
 
-	Camera::Camera(int cam_attr, Vec4 cam_pos, Vec4 cam_dir, Vec4 cam_target, float near_clip_z, float far_clip_z, float fov, float viewport_width, float viewport_height)
+	Camera::Camera(Vec4 cam_pos, Vec4 cam_dir, Vec4 cam_target, float near_clip_z, float far_clip_z, float fov, float viewport_width, float viewport_height, int cam_attr)
 	{
 		m_attr = cam_attr;
 		m_pos.InitWithVec4(cam_pos);
@@ -19,11 +21,11 @@ namespace T3D {
 		m_near_clip_z = near_clip_z;
 		m_far_clip_z = far_clip_z;
 
-		m_viewport_width = viewport_width;
-		m_viewport_height = viewport_height;
-		m_viewport_center_x = (viewport_width - 1) / 2.0f;
-		m_viewport_center_y = (viewport_height - 1) / 2.0f;
-		m_aspect_ratio = float(m_viewport_width) / m_viewport_height;
+		m_viewport.m_width = viewport_width;
+		m_viewport.m_height = viewport_height;
+		m_viewport.m_x = 0;
+		m_viewport.m_y = 0;
+		m_aspect_ratio = float(m_viewport.m_width) / m_viewport.m_height;
 
 		//将所有的矩阵设为单位矩阵
 		m_cam.Identity();
@@ -250,8 +252,8 @@ namespace T3D {
 
 	void Camera::BuildScreenMatrix(Matrix44 mat)
 	{
-		float alpha = 0.5f * m_viewport_width - 0.5f;
-		float beta = 0.5f * m_viewport_height - 0.5f;
+		float alpha = 0.5f * m_viewport.m_width - 0.5f;
+		float beta = 0.5f * m_viewport.m_height - 0.5f;
 
 		mat.Identity();
 		mat.m_mat[0][0] = alpha;
@@ -260,11 +262,16 @@ namespace T3D {
 		mat.m_mat[2][1] = beta;
 	}
 
-	void Camera::GetScreenRect(Rect &rect)
+	void Camera::SetViewPort(int x, int y, int width, int height)
 	{
-		rect.m_width = m_viewport_width;
-		rect.m_height = m_viewport_height;
-		rect.m_x = m_viewport_center_x - 0.5 * rect.m_width;
-		rect.m_y = m_viewport_center_y - 0.5 * rect.m_height;
+		m_viewport.m_x = x;
+		m_viewport.m_y = x;
+		m_viewport.m_width = width;
+		m_viewport.m_height = height;
+	}
+
+	const ViewPort & Camera::GetViewPort() const 
+	{
+		return m_viewport;
 	}
 }

@@ -1,16 +1,16 @@
 #define WIN32_LEAN_AND_MEAN  //去除无用的头文件，加快编译速度
 
+#include <iostream>
 #include <Windows.h>
 #include <WinUser.h>
+#include <tchar.h>
 
-#define WINDOW_CLASS_NAME "WIN3DCLASS"
-#define WINDOW_TITLE "3DTriangle"
-#define WINDOW_WIDTH 800
-#define WINDOW_HEIGHT 600
-
-//全局变量
-HWND main_window_handle;
-HINSTANCE main_instance;
+#include <T3DEngine/T3DDevice.h>
+#include <T3DEngine/T3DWindow.h>
+#include <T3DEngine/T3DCamera.h>
+#include <T3DEngine/T3DMath.h>
+#include <T3DEngine/T3DMesh.h>
+#include <T3DEngine/T3DLog.h>
 
 //游戏初始化
 void GameInit()
@@ -18,78 +18,50 @@ void GameInit()
 
 }
 
-//窗口处理函数
-LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
-{
-	PAINTSTRUCT ps;  //WM_PAINT中使用
-	HDC hdc;  
-
-	switch (msg)
-	{
-	case WM_CREATE:
-		{
-		//做初始化工作
-		return 0;
-		}
-		break;
-	case WM_PAINT:
-		{
-		//绘制
-		hdc = BeginPaint(hwnd, &ps);
-
-		EndPaint(hwnd, &ps);
-		return 0;
-		}
-		break;
-	case WM_DESTROY:
-		{
-		//关闭应用程序
-		PostQuitMessage(0);
-		return 0;
-		}
-		break;
-	}//end switch
-
-	//处理我们不关心得其他消息
-	return DefWindowProc(hwnd, msg, wparam, lparam);
-}
 
 int WINAPI WinMain(HINSTANCE hinstance, HINSTANCE hprevinstance, LPSTR lpcmdstr, int ncmdshow)
 {
-	WNDCLASS winclass; //窗口创建结构体
-	HWND hwnd;  //窗口句柄
-	MSG msg; //窗口消息
-	HDC hdc;  //设备上下文的属性信息
-	PAINTSTRUCT ps; //窗口绘制客户区的信息
+	//T3D::Log::OpenErrorFile("ERROR.TXT");
 
-	winclass.style = CS_DBLCLKS | CS_OWNDC | CS_HREDRAW | CS_VREDRAW;  //创建的窗口样式
-	winclass.lpfnWndProc = WindowProc; //窗口处理函数
-	winclass.cbClsExtra = 0; //WNDCLASS类的额外空间，成为附属内存，可以为属于这个窗口类的所有窗口共享
-	winclass.cbWndExtra = 0; //为每个窗口分配额外附加内存空间
+	T3D::Window *window = new T3D::Window(800, 600, "SoftRender");
+	if (!window->Init())
+	{
+		DWORD err = GetLastError();
+		MessageBox(NULL, _T("window init error"), _T("ERROR"), MB_OKCANCEL);
+		return 1;
+	}
+	unsigned int *framebuffer = window->GetFrameBuffer();
 
-	winclass.hInstance = hinstance;
-	winclass.hIcon = LoadIcon(NULL, IDI_APPLICATION);  //加载图标
-	winclass.hCursor = LoadCursor(NULL, IDC_ARROW);  //鼠标
-	winclass.hbrBackground = (HBRUSH)GetStockObject(BLACK_BRUSH);
-	winclass.lpszMenuName = NULL;
-	winclass.lpszClassName = WINDOW_CLASS_NAME;
+	T3D::Camera * cam = new T3D::Camera(T3D::Vec4{ 0, 0, 0, 1 }, T3D::Vec4{ 0, 0, 0, 1 }, T3D::Vec4{ 0, 0, 1, 1 }, 50.0, 1000.0, 90.0, 800, 600);
 
-	//注册窗口类
-	if (!RegisterClass(&winclass)) return 1;
+	T3D::Device *device = new T3D::Device(cam);
+	device->Init(framebuffer);
 
-	//创建窗口类
-	if (!(hwnd = CreateWindow(WINDOW_CLASS_NAME, WINDOW_TITLE, WS_OVERLAPPED | WS_SYSMENU | WS_CAPTION, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, NULL, NULL, hinstance, NULL))) return 1;
+	T3D::Object *object = new T3D::Object;
+	int result = T3D::PLGLoader::LoadObjectPLG(object, "C:/Users/shentongle/Desktop/tank1.plg", T3D::Vec4{ 1, 1, 1, 0 }, T3D::Vec4{ 0, 0, 300, 0 }, T3D::Vec4{0, 0, 0, 0});
+	if (result != 0)
+	{
+		MessageBox(NULL, _T("Load Plg file error"), _T("ERROR"), MB_OKCANCEL);
+		return 1;
+	}
 
-	main_instance = hinstance;
-	main_window_handle = hwnd;
+	cam->BuildCameraMatrixUVN(UVN_MODE_SIMPLE);
 
+	object->SetPos(T3D::Vec4{ 0, 0, 400 });
+	object->SynchroVertex();
+	object->ModelToWorld();
+	object->WorldToCamera(*cam);
+	object->CameraToPerspective(*cam);
+	object->PerspectiveToScreen(*cam);
+	object->DrawWire16(*cam, framebuffer, 600);
 
-	//窗口重新设置下
-	RECT window_rect = { 0, 0, WINDOW_WIDTH - 1, WINDOW_HEIGHT - 1 };
-	AdjustWindowRectEx(&window_rect, GetWindowLong(main_window_handle, GWL_STYLE), GetMenu(main_window_handle) != NULL, GetWindowLong(main_window_handle, GWL_EXSTYLE));
+	while (!window->IsExit()) 
+	{
+		device->Clear();
+		window->Dispatch();
+		object->DrawWire16(*cam, framebuffer, 600);
+		window->Update();
+	}
 
-	MoveWindow(main_window_handle, 0, 0, window_rect.left - window_rect.right, window_rect.bottom - window_rect.top, false);
-	ShowWindow(main_window_handle, SW_SHOW);
-
-
+	return 0;
 }

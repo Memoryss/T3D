@@ -18,7 +18,7 @@ namespace T3D {
 		int m_y;  //起始点y坐标
 	};
 
-	UNSHORT(*RGB16Bit) (int r, int g, int b);
+	//UNSHORT(*RGB16Bit) (int r, int g, int b);
 
 	UNSHORT RGB16Bit565(int r, int g, int b);
 	UNSHORT RGB16Bit555(int r, int g, int b);
@@ -28,9 +28,9 @@ namespace T3D {
 	int ClipLine(int &x1, int &y1, int &x2, int &y2, const Rect &rect);
 	
 	//线段绘制 线段的起始坐标 颜色 video buffer起始地址  pitch(像素每一行之间的字节间隔)   Bresenham算法（直线光栅化算法）
-	int DrawLine(int x0, int y0, int x1, int y1, int color, UCHAR *vb_start, int lpitch);
+	int DrawLine(int x0, int y0, int x1, int y1, int color, unsigned int *vb_start, int lpitch);
 
-	int Draw_Clip_Line16(int x0, int y0, int x1, int y1, const Rect &rect, int color, UCHAR *vb_start, int lpitch);
+	int Draw_Clip_Line16(int x0, int y0, int x1, int y1, const Rect &rect, int color, unsigned int *vb_start, int lpitch);
 }
 
 #endif

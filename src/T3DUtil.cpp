@@ -65,14 +65,14 @@ namespace T3D {
 		int recty2 = rect.m_y + rect.m_height;
 
 		int p1_code = 0, p2_code = 0, temp = -1;
-		if (rectx1 < rectx2)
+		if (rectx1 > rectx2)
 		{
 			temp = rectx1;
 			rectx1 = rectx2;
 			rectx2 = temp;
 		}
 
-		if (recty1 < recty2)
+		if (recty1 > recty2)
 		{
 			temp = recty1;
 			recty1 = recty2;
@@ -264,7 +264,7 @@ namespace T3D {
 		return 0;
 	} //end CLIP_LINE
 
-	int DrawLine(int x0, int y0, int x1, int y1, int color, UCHAR *vb_start, int lpitch)
+	int DrawLine(int x0, int y0, int x1, int y1, int color, unsigned int *vb_start, int lpitch)
 	{
 		/************************************************************************/
 		/*                           BresenhamÀ„∑®                                          
@@ -352,7 +352,7 @@ namespace T3D {
 		return 0;
 	} // end draw line
 
-	int Draw_Clip_Line16(int x0, int y0, int x1, int y1, const Rect &rect, int color, UCHAR *vb_start, int lpith)
+	int Draw_Clip_Line16(int x0, int y0, int x1, int y1, const Rect &rect, int color, unsigned int *vb_start, int lpith)
 	{
 		if (ClipLine(x0, y0, x1, y1, rect) == 0)
 		{

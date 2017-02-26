@@ -69,9 +69,9 @@ namespace T3D {
 	//三角形
 	struct Triangle
 	{
-		int m_state;   //状态信息
-		int m_attr;    //物理属性
-		int m_color;   //多边形的颜色
+		int m_state = 0;   //状态信息
+		int m_attr = 0;    //物理属性
+		int m_color = 0;   //多边形的颜色
 		Vec4 *m_vlist; //定点列表
 		int m_vertices[3];//索引
 	};
@@ -111,6 +111,9 @@ namespace T3D {
 		int m_num_polys;  //多边形数
 		std::vector<Triangle> m_plist;  //多边形
 
+		//设置位置
+		void SetPos(const Vec4 &pos);
+
 		int ComputeRadius();
 		//最后一个参数是选择是否对朝向向量进行变换
 		void Transform(const Matrix44 &mt, int coord_select, int transform_basis);
@@ -133,7 +136,9 @@ namespace T3D {
 		//投影到屏幕
 		void PerspectiveToScreen(const Camera &cam);
 		//繪製線框
-		void DrawWire16(const Camera &cam, UCHAR *video_buffer, int lpitch);
+		void DrawWire16(const Camera &cam, unsigned int *video_buffer, int lpitch);
+		//同步
+		void SynchroVertex();
 	};
 	
 
@@ -169,16 +174,17 @@ namespace T3D {
 		//投影到屏幕
 		void PerspectiveToScreen(const Camera &cam);
 		//绘制线框
-		void DrawWire16(Camera &cam, UCHAR *video_buffer, int lptch);
+		void DrawWire16(const Camera &cam, unsigned int *video_buffer, int lptch);
 	};
 
 	class PLGLoader
 	{
+	public:
+		static int LoadObjectPLG(Object *obj, const char *filename, const Vec4 &scale, const Vec4 &pos, const Vec4 &rot);
 		// 从plg文件中加载一行数据
 		// 跳过注释和空行，如果文件为空返回NULL
 		static char * GetLinePLG(char *buffer, int maxlength, FILE *fp);
 		//初始化物体（比例， 位置，旋转）
-		static int LoadObjectPLG(Object *obj, const char *filename, const Vec4 &scale, const Vec4 &pos, const Vec4 &rot);
 	};
 }
 

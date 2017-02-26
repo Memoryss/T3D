@@ -2,6 +2,8 @@
 
 #include <tchar.h>
 
+bool EXIT = false;
+
 namespace T3D {
 
 	//窗口处理函数
@@ -34,6 +36,12 @@ namespace T3D {
 			return 0;
 		}
 		break;
+		case WM_CLOSE:
+		{
+			EXIT = true;
+			return 0;
+		}
+		break;
 		}//end switch
 
 		 //处理我们不关心得其他消息
@@ -47,12 +55,12 @@ namespace T3D {
 
 	bool Window::Init()
 	{
-		WNDCLASS wc = { CS_DBLCLKS | CS_OWNDC | CS_HREDRAW | CS_VREDRAW , WindowProc, 0, 0, 0, NULL, NULL, NULL, NULL, _T(m_title.c_str()) };
+		WNDCLASS wc = { CS_DBLCLKS | CS_OWNDC | CS_HREDRAW | CS_VREDRAW , WindowProc, 0, 0, 0, NULL, NULL, NULL, NULL,_T("WINDOW") };
 
 		// -m_height表示top - bottom
 		BITMAPINFO bi = { {sizeof(BITMAPINFOHEADER), m_width, -m_height, 1, 32, BI_RGB, m_width * m_height * 4, 0, 0, 0, 0} };
 
-		RECT rect = { 0, 0, m_width, m_height };
+		RECT rect = { 0, 0, m_width - 1, m_height - 1 };
 
 		// 关闭窗口相关
 		Close();
@@ -66,7 +74,7 @@ namespace T3D {
 		}
 
 		//创建窗口
-		m_handle = CreateWindow(_T("WINDOW"), m_title.c_str(), WS_OVERLAPPED | WS_SYSMENU | WS_CAPTION, 0, 0, 0, 0, NULL, NULL, wc.hInstance, NULL);
+		m_handle = CreateWindow(_T("WINDOW"), m_title.c_str(), WS_OVERLAPPED | WS_SYSMENU | WS_CAPTION, 0, 0, m_width, m_height, NULL, NULL, wc.hInstance, NULL);
 		if (m_handle == 0) return false;
 
 		HDC hDC = GetDC(m_handle);
@@ -74,7 +82,7 @@ namespace T3D {
 		ReleaseDC(m_handle, hDC);
 
 		//创建应用程序可以直接写入的，与设备无关的位图
-		m_hb = CreateDIBSection(m_hdc, &bi, DIB_RGB_COLORS, m_framebuffer, 0, 0);
+		m_hb = CreateDIBSection(m_hdc, &bi, DIB_RGB_COLORS, &m_framebuffer, 0, 0);
 		if (m_hb == NULL) return false;
 		m_ob = (HBITMAP)SelectObject(m_hdc, m_hb);
 
@@ -90,7 +98,7 @@ namespace T3D {
 		SetForegroundWindow(m_handle); //设置优先权较高
 
 		ShowWindow(m_handle, SW_NORMAL);
-		dispatch();
+		Dispatch();
 
 		memset(m_framebuffer, 0, m_width * m_height * 4);
 
@@ -124,7 +132,7 @@ namespace T3D {
 		}
 	}
 
-	void Window::dispatch()
+	void Window::Dispatch()
 	{
 		MSG msg;
 		while (true)
@@ -143,6 +151,16 @@ namespace T3D {
 		BitBlt(hdc, 0, 0, m_width, m_height, m_hdc, 0, 0, SRCCOPY); 
 		ReleaseDC(m_handle, hdc);
 
-		dispatch();
+		Dispatch();
+	}
+
+	unsigned int * Window::GetFrameBuffer()
+	{
+		return (unsigned int *)m_framebuffer;
+	}
+
+	bool Window::IsExit()
+	{
+		return EXIT;
 	}
 }

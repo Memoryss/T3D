@@ -15,14 +15,34 @@
 #define UVN_MODE_SIMPLE 0
 #define UVN_MODE_SPHERICAL 1
 
+//相机属性
+#define CAM_PROJ_NORMALIZED 0X0001
+#define CAM_PROJ_SCREEN		0X0002
+#define CAM_PROJ_FOV90		0X004
+
+#define CAM_MODEL_EULER		0X0008
+#define CAM_MODEL_UVN		0X0010
+
 namespace T3D {
+
+	struct ViewPort
+	{
+		int m_x;
+		int m_y;
+		int m_width;
+		int m_height;
+
+		ViewPort() {}
+		ViewPort(int x, int y, int width, int height)
+			:m_x(x), m_y(y), m_width(width), m_height(height) { }
+	};
 
 	// UVN 相机 n 注视向量， v 上方的向量， u 右方的向量
 
 	class Camera 
 	{
 	public:
-		Camera(int cam_attr, Vec4 cam_pos, Vec4 cam_dir, Vec4 cam_target, float near_clip_z, float far_clip_z, float fov, float viewport_width, float viewport_height);
+		Camera(Vec4 cam_pos, Vec4 cam_dir, Vec4 cam_target, float near_clip_z, float far_clip_z, float fov, float viewport_width, float viewport_height, int cam_attr = CAM_MODEL_UVN);
 
 		//根据相机的位置和欧拉角度计算矩阵
 		//参数表示旋转的顺序  xyz xzy ...
@@ -35,8 +55,9 @@ namespace T3D {
 		//投影到屏幕矩陣
 		void BuildScreenMatrix(Matrix44 mat);
 
-		//或得屏幕矩形
-		void GetScreenRect(Rect &rect);
+		//视口
+		void SetViewPort(int x, int y, int width, int height);
+		const ViewPort & GetViewPort() const;
 	public:
 
 		int m_state;
@@ -70,11 +91,8 @@ namespace T3D {
 		float m_viewplane_width;  //視平面的寬度和高度
 		float m_viewplane_height; //對於歸一化投影，為2*2 否則大小和視口或屏幕窗口相同
 
-		//屏幕和視口是同義詞
-		float m_viewport_width;  //屏幕、視口的寬度和高度
-		float m_viewport_height;
-		float m_viewport_center_x;  //中心
-		float m_viewport_center_y;
+		//视口
+		ViewPort m_viewport;
 
 		float m_aspect_ratio; //屏幕的寬高比
 
