@@ -1,3 +1,7 @@
+
+
+include_directories(${CMAKE_SOURCE_DIR}/math/src)
+
 set (PUB_HDR
 	T3DMath.h
 	T3DLog.h
