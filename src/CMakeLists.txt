@@ -3,7 +3,6 @@
 include_directories(${CMAKE_SOURCE_DIR}/math/src)
 
 set (PUB_HDR
-	Frustum.h
 	T3DMath.h
 	T3DLog.h
 	T3DMesh.h
@@ -15,7 +14,6 @@ set (PUB_HDR
 )
 
 add_library(T3DEngine
-	Frustum.cpp
 	T3DMath.cpp
 	T3DLog.cpp
 	T3DMesh.cpp
