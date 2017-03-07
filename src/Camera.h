@@ -15,6 +15,8 @@ namespace T3D {
 		void SetDirection(const Vec3 &dir);
 		const Vec3 & GetDirection();
 
+		void UpdateFrustum();
+
 	protected:
 		Vec3 m_pos;  //相机坐在位置
 		Quaternion m_quat;  //相机的旋转四元数
