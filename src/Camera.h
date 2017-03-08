@@ -2,6 +2,7 @@
 #define __CAMERA_H__
 
 #include <Frustum.h>
+#include <Quaternion.h>
 
 namespace T3D {
 
@@ -9,11 +10,19 @@ namespace T3D {
 	{
 	public:
 
+		void Update();
+
 		void SetPosition(const Vec3 &pos);
 		const Vec3 & GetPosition();
 
-		void SetDirection(const Vec3 &dir);
-		const Vec3 & GetDirection();
+		void SetRotate(const Quaternion &dir);
+
+		/************************************************************************/
+		/*	pitchÈÆxÖáĞı×ª£¬¸©Ñö½Ç
+			yawÈÆyÖáĞı×ª£¬Æ«º½½Ç
+			rollÈÆzÖáĞı×ª£¬·­¹ö½Ç														*/
+		/************************************************************************/
+		void Rotate(float pitch, float yaw, float roll);
 
 	protected:
 		Vec3 m_pos;  //Ïà»ú×øÔÚÎ»ÖÃ
