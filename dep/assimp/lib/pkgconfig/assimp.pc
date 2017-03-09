@@ -1,0 +1,11 @@
+prefix=G:/github/assimp-3.3/stage
+exec_prefix=G:/github/assimp-3.3/stage/bin
+libdir=G:/github/assimp-3.3/stage/lib
+includedir=G:/github/assimp-3.3/stage/include/assimp
+
+Name: Assimp
+Description: Import various well-known 3D model formats in an uniform manner.
+Version: 3.2.0
+Libs: -L${libdir} -lassimp
+Libs.private:  
+Cflags: -I${includedir}
