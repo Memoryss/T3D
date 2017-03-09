@@ -1,6 +1,6 @@
 
 
-include_directories(${CMAKE_SOURCE_DIR}/math/src)
+include_directories(${CMAKE_SOURCE_DIR}/dep/tmath/src)
 
 set (PUB_HDR
 	Camera.h

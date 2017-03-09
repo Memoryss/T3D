@@ -1,0 +1,3 @@
+[submodule "dep/tmath"]
+	path = dep/tmath
+	url = https://github.com/Memoryss/T3DMath.git
