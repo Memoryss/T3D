@@ -10,6 +10,8 @@ namespace T3D {
 	{
 	public:
 
+		Camera();
+
 		void Update();
 
 		void SetPosition(const Vec3 &pos);
@@ -22,7 +24,17 @@ namespace T3D {
 			yaw绕y轴旋转，偏航角
 			roll绕z轴旋转，翻滚角														*/
 		/************************************************************************/
-		void Rotate(float pitch, float yaw, float roll);
+		//单位：角度
+		void Pitch(float pitch);
+
+		void Yaw(float yaw);
+
+		void Roll(float roll);
+		
+		void Rotate(const Vec3 &axis, float angle);
+
+	private:
+		void init();
 
 	protected:
 		Vec3 m_pos;  //相机坐在位置
