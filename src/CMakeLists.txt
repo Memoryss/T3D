@@ -3,7 +3,12 @@
 include_directories(${CMAKE_SOURCE_DIR}/dep/tmath/src)
 
 set (PUB_HDR
+	Mesh.h
+	Vertex.h
+	Texture.h
+	Color.h
 	Camera.h
+	Vertex.h
 	T3DMath.h
 	T3DLog.h
 	T3DMesh.h
@@ -15,7 +20,11 @@ set (PUB_HDR
 )
 
 add_library(T3DEngine
+	Vertex.cpp
+	Texture.cpp
+	Mesh.cpp
 	Camera.cpp
+	Vertex.cpp
 	T3DMath.cpp
 	T3DLog.cpp
 	T3DMesh.cpp
