@@ -45,7 +45,7 @@ namespace T3D {
 				memcpy(m_indices, f.m_indices, m_numIndices * sizeof(uint32));
 			}
 			else {
-				m_indices = NULL;
+				m_indices = NULL; 
 			}
 
 			return *this;
