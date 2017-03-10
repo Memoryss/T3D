@@ -2,6 +2,7 @@
 #define __MESH_H__
 
 #include <string>
+#include <vector>
 
 #include <Vector.h>
 #include "Color.h"
@@ -11,6 +12,7 @@ typedef unsigned int uint32;
 #define MAX_NUMBER_OF_TEXTURECOORDS 0X08
 #define MAX_NUMBER_OF_COLOR_SETS 0X08
 
+class aiMesh;
 
 namespace T3D {
 
@@ -21,7 +23,9 @@ namespace T3D {
 		std::vector <Vec2> texcoord;
 		Vec3 tangent;
 		Vec3 bitangent;
-		std::vector <Color> color;
+		std::vector <Color4D> color;
+
+		void SetData(aiMesh *mesh, uint32 index);
 	};
 
 	//Í¼Ôª
@@ -80,7 +84,6 @@ namespace T3D {
 
 		void Draw(); //»æÖÆ
 
-	private:
 		Vertex *m_vertics;
 		uint32 m_numVertices;
 

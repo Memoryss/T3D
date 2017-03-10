@@ -1,11 +1,14 @@
 
 
 include_directories(${CMAKE_SOURCE_DIR}/dep/tmath/src)
+include_directories(${CMAKE_SOURCE_DIR}/dep/assimp/include)
+include_directories(${CMAKE_SOURCE_DIR}/dep/glog/include)
 
 set (PUB_HDR
 	Mesh.h
 	Vertex.h
 	Texture.h
+	Model.h
 	Color.h
 	Camera.h
 	Vertex.h
@@ -22,6 +25,7 @@ set (PUB_HDR
 add_library(T3DEngine
 	Vertex.cpp
 	Texture.cpp
+	Model.cpp
 	Mesh.cpp
 	Camera.cpp
 	Vertex.cpp
