@@ -4,8 +4,13 @@
 #include <string>
 
 #include <Vector.h>
+#include "Color.h"
 
 typedef unsigned int uint32;
+
+#define MAX_NUMBER_OF_TEXTURECOORDS 0X08
+#define MAX_NUMBER_OF_COLOR_SETS 0X08
+
 
 namespace T3D {
 
@@ -13,10 +18,10 @@ namespace T3D {
 	{
 		Vec3 position;
 		Vec3 normal;
-		Vec2 texcoords;
+		std::vector <Vec2> texcoord;
 		Vec3 tangent;
 		Vec3 bitangent;
-		Vec4 color;
+		std::vector <Color> color;
 	};
 
 	//Í¼Ôª
@@ -64,9 +69,21 @@ namespace T3D {
 	class Mesh
 	{
 	public:
+
+		Mesh();
+
+		~Mesh();
+
+		uint32 GetNumUVChannels() const;
+
+		uint32 GetNumColorChannels() const;
+
 		void Draw(); //»æÖÆ
 
 	private:
+		Vertex *m_vertics;
+		uint32 m_numVertices;
+
 		Face *m_faces;
 		uint32 m_numFaces;
 
