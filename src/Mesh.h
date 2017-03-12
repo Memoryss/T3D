@@ -23,7 +23,7 @@ namespace T3D {
 		std::vector <Vec2> texcoord;
 		Vec3 tangent;
 		Vec3 bitangent;
-		std::vector <Color4D> color;
+		//std::vector <Color4D> color;
 
 		void SetData(aiMesh *mesh, uint32 index);
 	};
@@ -60,7 +60,7 @@ namespace T3D {
 			else if (m_indices && m_numIndices == f.m_numIndices)
 			{
 				for (unsigned int i = 0; i < this->m_numIndices; ++i)
-					if (m_indices[i] != o.m_indices[i])return false;
+					if (m_indices[i] != f.m_indices[i])return false;
 				return true;
 			}
 			return false;
@@ -80,7 +80,7 @@ namespace T3D {
 
 		uint32 GetNumUVChannels() const;
 
-		uint32 GetNumColorChannels() const;
+		//uint32 GetNumColorChannels() const;
 
 		void Draw(); //»æÖÆ
 

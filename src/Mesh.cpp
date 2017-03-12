@@ -22,14 +22,18 @@ namespace T3D {
 		bitangent.y = mesh->mBitangents[index].y;
 		bitangent.z = mesh->mBitangents[index].z;
 
-		uint32 channels = mesh->GetNumColorChannels();
-		for (uint32 i = 0; i < channels; ++i)
+		//TODO 暂时只使用第一个纹理通道
+		texcoord.push_back(Vec2());
+		if (mesh->mTextureCoords[0])
 		{
-			Vec2 v;
-			v.x = mesh->mNumUVComponents
+			texcoord[texcoord.size() - 1].x = mesh->mTextureCoords[0]->x;
+			texcoord[texcoord.size() - 1].y = mesh->mTextureCoords[0]->y;
 		}
-
-		texcoord.push_back()
+		else
+		{
+			texcoord[texcoord.size() - 1].x = 0;
+			texcoord[texcoord.size() - 1].y = 0;
+		}
 	}
 
 	Mesh::Mesh() : m_numVertices(0), m_numFaces(0), m_vertics(NULL), m_faces(NULL)
@@ -53,7 +57,7 @@ namespace T3D {
 
 		return 0;
 	}
-
+	/*
 	uint32 Mesh::GetNumColorChannels() const
 	{
 		if (m_numVertices > 0)
@@ -63,6 +67,7 @@ namespace T3D {
 
 		return 0;
 	}
+	*/
 
 	void Mesh::Draw()
 	{

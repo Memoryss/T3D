@@ -34,11 +34,25 @@ namespace T3D {
 		tmesh.m_numVertices = mesh->mNumVertices;
 		for (uint32 i = 0; i < mesh->mNumVertices; ++i)
 		{
-			tmesh.m_vertics[i].position.x = mesh->mVertices[i].x;
-			tmesh.m_vertics[i].position.y = mesh->mVertices[i].y;
-			tmesh.m_vertics[i].position.z = mesh->mVertices[i].z;
-			tmesh.m_vertics[i]
+			//设置顶点数据
+			tmesh.m_vertics[i].SetData(mesh, i);
 		}
+
+		tmesh.m_numFaces = mesh->mNumFaces;
+		tmesh.m_faces = new Face[mesh->mNumFaces];
+		for (uint32 i = 0; i < mesh->mNumFaces; ++i)
+		{
+			//设置面数据
+			const auto &face = mesh->mFaces[i];
+			tmesh.m_faces[i].m_numIndices = face.mNumIndices;
+			tmesh.m_faces[i].m_indices = new uint32[face.mNumIndices];
+			for (uint32 j = 0; j < face.mNumIndices; ++j)
+			{
+				tmesh.m_faces[i].m_indices[j] = face.mIndices[j];
+			}
+		}
+
+
 	}
 
 	void Model::processNode(aiNode *node, const aiScene *scene)
@@ -47,6 +61,24 @@ namespace T3D {
 		{
 			//所有的mesh保存在scene中，子节点只保存其索引
 			aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
+		}
+	}
+
+	void Model::loadMatrixTextures(aiMaterial *material, aiTextureType type)
+	{
+		for (uint32 i = 0; i < material->GetTextureCount(type); ++i)
+		{
+			aiString path;
+			material->GetTexture(type, i, &path);
+			Texture *texture = new Texture(path.C_Str(), type);
+			auto iter = m_textures.find(path.C_Str());
+			if (iter != m_textures.end())
+			{
+				LOG(WARNING) << "Texture has been loaded ,name=" << path.C_Str();
+				break;
+			}
+			
+			m_textures[path.C_Str()] = texture;
 		}
 	}
 }
