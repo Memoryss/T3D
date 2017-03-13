@@ -52,7 +52,12 @@ namespace T3D {
 			}
 		}
 
-
+		if (mesh->mMaterialIndex >= 0)
+		{
+			aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
+			loadMatrixTextures(material, aiTextureType_DIFFUSE); //diffuseÌùÍ¼
+			loadMatrixTextures(material, aiTextureType_SPECULAR);
+		}
 	}
 
 	void Model::processNode(aiNode *node, const aiScene *scene)

@@ -20,6 +20,7 @@ set (PUB_HDR
 	T3DDevice.h
 	T3DWindow.h
 	T3DRasterizer.h
+	Rasterizer.h
 )
 
 add_library(T3DEngine
@@ -37,6 +38,7 @@ add_library(T3DEngine
 	T3DDevice.cpp
 	T3DWindow.cpp
 	T3DRasterizer.cpp
+	Rasterizer.cpp
 	${PUB_HDR}
 )
 
