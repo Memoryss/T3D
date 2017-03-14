@@ -41,6 +41,7 @@ namespace T3D {
 		auto iter = m_models.find(name);
 		if (iter != m_models.end())
 		{
+			LOG(INFO) << "Model has been created, name=" << name;
 			return iter->second;
 		}
 
@@ -64,20 +65,50 @@ namespace T3D {
 
 	Model * Scene::GetModel(const char * name)
 	{
-		return nullptr;
+		auto iter = m_models.find(name);
+		if (iter != m_models.end())
+		{
+			LOG(WARNING) << "can't find model, name=" << name;
+			return NULL;
+		}
+
+		return iter->second;
 	}
 
 	void Scene::RemoveModel(const char * name)
 	{
+		auto iter = m_models.find(name);
+		if (iter != m_models.end())
+		{
+			LOG(WARNING) << "can't find model, name=" << name;
+		}
+
+		m_models.erase(iter);
 	}
 
 	void Scene::RemoveModel(Model * model)
 	{
+		auto iter = m_models.end();
+		for (; iter != m_models.end(); ++iter)
+		{
+			if (model == iter->second)
+			{
+				m_models.erase(iter);
+				return;
+			}
+		}
 	}
 
 	Camera * Scene::CreateCamera(const char * name)
 	{
-		return nullptr;
+		auto iter = m_cameras.find(name);
+		if (iter != m_cameras.end())
+		{
+			LOG(INFO) << "Camera has been created, name=" << name;
+			return iter->second;
+		}
+
+		Camera *cam = new Camera;
 	}
 
 	Camera * Scene::GetCamera(const char * name)
