@@ -3,10 +3,10 @@
 
 namespace T3D {
 
-	struct Color4D
+	struct Color
 	{
-		Color4D() {}
-		Color4D(float red, float green, float blue, float alpha)
+		Color() {}
+		Color(float red, float green, float blue, float alpha)
 		{
 			r = red;
 			g = green;
@@ -14,10 +14,10 @@ namespace T3D {
 			g = alpha;
 		}
 
-		float r = 0.0f;
-		float g = 0.0f;
-		float b = 0.0f;
-		float a = 0.0f;
+		float r = 1.0f;
+		float g = 1.0f;
+		float b = 1.0f;
+		float a = 1.0f;
 	};
 
 }

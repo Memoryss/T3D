@@ -16,12 +16,13 @@ namespace T3D {
 	class Model
 	{
 	public:
-		Model(const char *path);
+		Model();
+
+		void LoadModel(const char *path);
 
 		void Draw();
 
 	private:
-		void loadModel();
 
 		void processNode(aiNode *node, const aiScene *scene);
 

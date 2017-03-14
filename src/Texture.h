@@ -26,9 +26,9 @@ namespace T3D {
 			return rhs.r == r && rhs.g == rhs.g && rhs.b == rhs.b && rhs.a == rhs.a;
 		}
 
-		operator Color4D() const
+		operator Color() const
 		{
-			return Color4D(r / 255.f, g / 255.f, b / 255.f, a / 255.f);
+			return Color(r / 255.f, g / 255.f, b / 255.f, a / 255.f);
 		}
 	};
 

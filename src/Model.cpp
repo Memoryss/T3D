@@ -8,13 +8,15 @@
 
 namespace T3D {
 
-	Model::Model(const char *path) : m_filename(path)
+	Model::Model() 
 	{
-		loadModel();
+		
 	}
 
-	void Model::loadModel()
+	void Model::LoadModel(const char *path)
 	{
+		m_filename = path;
+
 		Assimp::Importer importer;
 		//flag 转化为三角形，生成法线，合并mesh
 		const aiScene *scene = importer.ReadFile(m_filename, aiProcess_Triangulate | aiProcess_GenNormals | aiProcess_OptimizeMeshes);
