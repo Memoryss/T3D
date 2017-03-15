@@ -7,28 +7,21 @@ namespace T3D {
 		init();
 	}
 
+	Camera::Camera(float fov, float aspect, float zNear, float zFar, ProjectionType type) : 
+		Frustum(zNear, zFar, aspect, fov, type)
+	{
+		init();
+	}
+
 	void Camera::Update()
 	{
-		if (m_dirty) {
-			UpdateFrustum(m_pos, m_quat);
+		if (!m_dirty)
+		{
+			return;
 		}
-	}
 
-	void Camera::SetPosition(const Vec3 &pos)
-	{
-		m_dirty = true;
-		m_pos = pos;
-	}
-
-	const Vec3 & Camera::GetPosition()
-	{
-		return m_pos;
-	}
-
-	void Camera::SetRotate(const Quaternion &quat)
-	{
-		m_quat = quat;
-		m_dirty = true;
+		UpdateFrustum(m_pos, m_quat);
+		m_dirty = false;
 	}
 
 	void Camera::Pitch(float pitch)

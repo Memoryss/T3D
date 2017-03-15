@@ -28,6 +28,45 @@ namespace T3D {
 		processNode(scene->mRootNode, scene);
 	}
 
+	void Model::Update()
+	{
+		//TODO 可以优化成一个函数直接构造，而不是相乘
+		//旋转 缩放 平移
+
+		if (!m_dirty)
+		{
+			return;
+		}
+
+		m_worldMatrix = Matrix44::IDENTITY;  // 需要设置为单位矩阵？
+
+		Matrix33 rotateM3;
+		m_quat.ToRotationMatrix(rotateM3);
+		Matrix44 rotateM4(rotateM3);
+
+		Matrix44 transM = Matrix44::getTrans(m_pos);
+		Matrix44 scaleM = Matrix44::getScale(m_scale);
+
+		m_worldMatrix = m_worldMatrix * transM;
+		m_worldMatrix = m_worldMatrix * scaleM;
+		m_worldMatrix = m_worldMatrix * rotateM4;
+
+		m_dirty = false;
+	}
+
+	void Model::Draw()
+	{
+		if (!m_isVisible)
+		{
+			return;
+		}
+
+		for each(auto iter in m_meshs)
+		{
+			iter.Draw();
+		}
+	}
+
 	void Model::processMesh(aiMesh *mesh, const aiScene *scene)
 	{
 		m_meshs.push_back(Mesh());

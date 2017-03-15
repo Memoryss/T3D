@@ -11,12 +11,23 @@ namespace T3D {
 	public:
 
 		void SetPosition(const Vec3 &pos);
-		CO
+		const Vec3 & GetPosition();
+		
+		void SetRotate(const Quaternion &quat);
+		const Quaternion & GetRotate();
 
-	private:
+		void SetVisible(bool visible);
+		bool IsVisible();
+
+		virtual void Update() = 0;
+
+	protected:
 		Vec3 m_pos;
-
+		Vec3 m_scale;
 		Quaternion m_quat;
+
+		bool m_isVisible;
+		bool m_dirty;
 	};
 
 }

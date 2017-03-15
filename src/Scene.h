@@ -31,10 +31,13 @@ namespace T3D {
 		Camera * GetCamera(const char *name);
 
 		Light * AddLight();
-		void RemoveLight();
+		void RemoveLight(Light *ligth);
 		void ClearLight();
 
 		void Update();
+
+	private:
+		void draw(Camera *cam);
 
 	private:
 		std::map <std::string, Model*> m_models;

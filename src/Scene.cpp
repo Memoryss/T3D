@@ -1,5 +1,7 @@
 #include "Scene.h"
 
+#include <assert.h>
+
 #include <glog/logging.h>
 
 #include "Model.h"
@@ -83,6 +85,7 @@ namespace T3D {
 			LOG(WARNING) << "can't find model, name=" << name;
 		}
 
+		delete iter->second;
 		m_models.erase(iter);
 	}
 
@@ -93,6 +96,7 @@ namespace T3D {
 		{
 			if (model == iter->second)
 			{
+				delete iter->second;
 				m_models.erase(iter);
 				return;
 			}
@@ -109,28 +113,88 @@ namespace T3D {
 		}
 
 		Camera *cam = new Camera;
+		m_cameras[name] = cam;
+		return cam;
 	}
 
 	Camera * Scene::GetCamera(const char * name)
 	{
-		return nullptr;
+		auto iter = m_cameras.find(name);
+		if (iter != m_cameras.end())
+		{
+			LOG(WARNING) << "can't find camear, name=" << name;
+			return NULL;
+		}
+
+		return iter->second;
 	}
 
 	Light * Scene::AddLight()
 	{
-		return nullptr;
+		Light *light = new Light(LIGHT_Directional);
+		m_lights.push_back(light);
+
+		return light;
 	}
 
-	void Scene::RemoveLight()
+	void Scene::RemoveLight(Light *light)
 	{
+		auto iter = m_lights.begin();
+		for (; iter != m_lights.end(); ++iter)
+		{
+			if (*iter == light)
+			{
+				delete *iter;
+				m_lights.erase(iter);
+				return;
+			}
+		}
 	}
 
 	void Scene::ClearLight()
 	{
+		auto iter = m_lights.begin();
+		for (; iter != m_lights.end(); ++iter)
+		{
+			delete *iter;
+		}
+
+		m_lights.clear();
 	}
 
 	void Scene::Update()
 	{
+		if (m_cameras.empty())
+		{
+			assert(0);
+			return;
+		}
+
+		//先改变位置，然后渲染
+		for each (auto iter in m_models)
+		{
+			if (iter.second)
+			{
+				iter.second->Update();
+			}
+		}
+
+		for each (auto iter in m_cameras)
+		{
+
+		}
+	}
+
+	void Scene::draw(Camera * cam)
+	{
+		//渲染模型
+		for each(auto iter in m_models)
+		{
+			if (iter.second)
+			{
+				iter.second->Draw();
+			}
+		}
 	}
 
 }

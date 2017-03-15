@@ -4,20 +4,19 @@
 #include <Frustum.h>
 #include <Quaternion.h>
 
+#include "Node.h"
+
 namespace T3D {
 
-	class Camera : public Frustum
+	class Camera : public Frustum, public Node
 	{
 	public:
 
 		Camera();
 
-		void Update();
+		Camera(float fov, float aspect, float zNear, float zFar, ProjectionType type);
 
-		void SetPosition(const Vec3 &pos);
-		const Vec3 & GetPosition();
-
-		void SetRotate(const Quaternion &dir);
+		virtual void Update() override;
 
 		/************************************************************************/
 		/*	pitch绕x轴旋转，俯仰角
@@ -35,12 +34,6 @@ namespace T3D {
 
 	private:
 		void init();
-
-	protected:
-		Vec3 m_pos;  //相机坐在位置
-		Quaternion m_quat;  //相机的旋转四元数
-
-		bool m_dirty = false;  //是否需要更新Frustum
 
 	};
 
