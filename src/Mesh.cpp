@@ -71,7 +71,7 @@ namespace T3D {
 
 	void Mesh::Draw()
 	{
-		for (uint32 )
+		for (uint32 i = 0; i < m_)
 	}
 
 }
