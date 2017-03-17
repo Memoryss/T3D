@@ -3,11 +3,11 @@
 
 namespace T3D {
 
-	class SoftRenderer
+	class Renderer
 	{
 	public:
-		SoftRenderer();
-		~SoftRenderer();
+		Renderer();
+		~Renderer();
 
 		bool InitRenderer(int width, int height);
 		bool StopRender();
