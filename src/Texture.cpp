@@ -60,7 +60,7 @@ namespace T3D {
 		}
 		else
 		{
-			LOG(ERROR) << "Bitmap load failed, path=" << path;
+			LOG(ERROR) << "Bitmap load failed, path=" << m_filename;
 			m_rawData = 0;
 		}
 	}

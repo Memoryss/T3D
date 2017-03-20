@@ -20,7 +20,7 @@ namespace T3D {
 	{
 		Vec3 position;
 		Vec3 normal;
-		std::vector <Vec2> texcoord;
+		Vec2 texcoord; //TODO 暂时支持一个纹理单元把
 		Vec3 tangent;
 		Vec3 bitangent;
 		//std::vector <Color4D> color;
@@ -78,7 +78,7 @@ namespace T3D {
 
 		~Mesh();
 
-		uint32 GetNumUVChannels() const;
+		//uint32 GetNumUVChannels() const;
 
 		//uint32 GetNumColorChannels() const;
 

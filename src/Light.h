@@ -14,7 +14,7 @@ namespace T3D{
 		LIGHT_Spot,
 	};
 
-	class Light
+	class Light : 
 	{
 	public:
 

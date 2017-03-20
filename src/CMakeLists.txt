@@ -13,6 +13,8 @@ set (PUB_HDR
 	Camera.h
 	Vertex.h
 	Node.h
+	Shader.h
+	BasicShaders.h
 	Scene.h
 	T3DMath.h
 	T3DLog.h
@@ -34,6 +36,7 @@ add_library(T3DEngine
 	Camera.cpp
 	Vertex.cpp
 	Node.cpp
+	BasicShaders.cpp
 	Scene.cpp
 	T3DMath.cpp
 	T3DLog.cpp

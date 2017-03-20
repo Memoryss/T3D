@@ -22,17 +22,15 @@ namespace T3D {
 		bitangent.y = mesh->mBitangents[index].y;
 		bitangent.z = mesh->mBitangents[index].z;
 
-		//TODO 暂时只使用第一个纹理通道
-		texcoord.push_back(Vec2());
 		if (mesh->mTextureCoords[0])
 		{
-			texcoord[texcoord.size() - 1].x = mesh->mTextureCoords[0]->x;
-			texcoord[texcoord.size() - 1].y = mesh->mTextureCoords[0]->y;
+			texcoord.x = mesh->mTextureCoords[0]->x;
+			texcoord.y = mesh->mTextureCoords[0]->y;
 		}
 		else
 		{
-			texcoord[texcoord.size() - 1].x = 0;
-			texcoord[texcoord.size() - 1].y = 0;
+			texcoord.x = 0;
+			texcoord.y = 0;
 		}
 	}
 
@@ -48,6 +46,7 @@ namespace T3D {
 
 	}
 
+	/*
 	uint32 Mesh::GetNumUVChannels() const
 	{
 		if (m_numVertices > 0) 
@@ -57,6 +56,7 @@ namespace T3D {
 
 		return 0;
 	}
+	*/
 	/*
 	uint32 Mesh::GetNumColorChannels() const
 	{
