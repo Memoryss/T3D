@@ -45,8 +45,21 @@ namespace T3D {
 			for (uint32 index = 0; index < g_lights.size(); ++index)
 			{
 				Light *lt = g_lights[index];
-				Vec3 pos = lt->g
+				Vec3 lightPos = lt->GetPosition();
+				Vec3 lightDir = lightPos - wPos;
+				lightDir.Normalize();
+
+				float diffuse; //漫反射
+				float specular;  //镜面反射
+				Vec3 dir = lt->GetDirection();
 			}
+		}
+
+	private:
+		//平行光  没有衰减参数
+		static inline void calcDirectionalLight()
+		{
+
 		}
 
 	public:

@@ -3,6 +3,7 @@
 
 #include <Vector.h>
 
+#include "Node.h"
 #include "Color.h"
 
 namespace T3D{
@@ -14,7 +15,7 @@ namespace T3D{
 		LIGHT_Spot,
 	};
 
-	class Light : 
+	class Light : public Node
 	{
 	public:
 
@@ -41,24 +42,16 @@ namespace T3D{
 		void SetSpecularColor(const Color &color);
 		const Color & GetSpecularColor();
 
-		//以后可以抽象出来的
-		void SetVisible(bool visible);
-		bool IsVisible() const;
-
 	private:
 
 		LightType m_lightType;
 
 		Vec3 m_direction;
-		Vec3 m_worldPos;
 		float m_radius;
 
 		Color m_ambientColor;
 		Color m_diffuseColor;
 		Color m_specularColor;
-
-		//以后可以抽象出来的
-		bool m_isVisible;
 
 		bool m_isActive;
 	};

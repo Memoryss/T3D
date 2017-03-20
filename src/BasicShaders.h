@@ -5,6 +5,7 @@
 
 namespace T3D {
 
+	//flat shader 每个多边形上的颜色一样，没有插值
 	class FlatShader : public Shader
 	{
 	public:

@@ -16,6 +16,8 @@ set (PUB_HDR
 	Shader.h
 	BasicShaders.h
 	Scene.h
+	Light.h
+	Material.h
 	T3DMath.h
 	T3DLog.h
 	T3DMesh.h
@@ -38,6 +40,7 @@ add_library(T3DEngine
 	Node.cpp
 	BasicShaders.cpp
 	Scene.cpp
+	Light.cpp
 	T3DMath.cpp
 	T3DLog.cpp
 	T3DMesh.cpp

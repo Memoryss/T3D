@@ -2,7 +2,7 @@
 
 namespace T3D {
 
-	Light::Light(LightType type) : m_lightType(type), m_direction(0.f, 0.f, -1.f), m_worldPos(0.f, 0.f, 0.f), m_radius(100.f), m_specularColor(1.f, 1.f, 1.f, 1.f), m_diffuseColor(1.f, 1.f, 1.f, 1.f), m_ambientColor(1.f, 1.f, 1.f, 1.f), m_isActive(true), m_isVisible(true)
+	Light::Light(LightType type) : m_lightType(type), m_direction(0.f, 0.f, -1.f), m_radius(100.f), m_specularColor(1.f, 1.f, 1.f, 1.f), m_diffuseColor(1.f, 1.f, 1.f, 1.f), m_ambientColor(1.f, 1.f, 1.f, 1.f), m_isActive(true)
 	{
 
 	}
@@ -70,16 +70,6 @@ namespace T3D {
 	const Color & Light::GetSpecularColor()
 	{
 		return m_specularColor;
-	}
-
-	void Light::SetVisible(bool visible)
-	{
-		m_isVisible = visible;
-	}
-
-	bool Light::IsVisible() const
-	{
-		return m_isVisible;
 	}
 
 }

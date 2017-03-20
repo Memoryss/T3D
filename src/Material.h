@@ -1,6 +1,8 @@
 #ifndef __MATERIAL_H__
 #define __MATERIAL_H__
 
+#include <vector>
+
 #include "Color.h"
 
 namespace T3D {
