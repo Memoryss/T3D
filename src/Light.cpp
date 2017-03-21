@@ -91,4 +91,34 @@ namespace T3D {
 	{
 		m_diffuseIntensity = intensity;
 	}
+
+	PointLight::PointLight() : Light(Light_Point)
+	{
+
+	}
+
+	void PointLight::SetPosition(const Vec3 &pos)
+	{
+		m_pos = pos;
+	}
+
+	const Vec3 & PointLight::GetPosition()
+	{
+		return m_pos;
+	}
+
+	DirectionLight::DirectionLight() : Light(Light_Direction)
+	{
+
+	}
+
+	const Vec3 & DirectionLight::GetDirection()
+	{
+		return m_dir;
+	}
+
+	void DirectionLight::SetDirection(const Vec3 &dir)
+	{
+		m_dir = dir;
+	}
 }

@@ -10,9 +10,9 @@ namespace T3D{
 
 	enum LightType
 	{
-		LIGHT_Directional = 0,
-		LIGHT_Point,
-		LIGHT_Spot,
+		Light_Direction = 0,
+		Light_Point,
+		Light_Spot,
 	};
 
 	class Light
@@ -76,9 +76,21 @@ namespace T3D{
 
 
 	private:
-		Vec3 &m_pos;
+		Vec3 m_pos;
 
-		float m_radius£»
+		//float m_radius£»
+	};
+
+	class DirectionLight : public Light
+	{
+	public:
+		DirectionLight();
+
+		void SetDirection(const Vec3 &pos);
+		const Vec3 & GetDirection();
+
+	private:
+		Vec3 m_dir;
 	};
 
 }
