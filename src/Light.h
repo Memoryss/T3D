@@ -15,7 +15,7 @@ namespace T3D{
 		LIGHT_Spot,
 	};
 
-	class Light : public Node
+	class Light
 	{
 	public:
 
@@ -42,18 +42,43 @@ namespace T3D{
 		void SetSpecularColor(const Color &color);
 		const Color & GetSpecularColor();
 
+		void SetAmbientIntensity(float intensity);
+		float GetAmbientIntensity();
+
+		void SetDiffuseIntensity(float intensity);
+		float GetDiffuseIntensity();
+
 	private:
 
 		LightType m_lightType;
 
-		Vec3 m_direction;
+		Vec3 m_direction;  //平行光使用
 		float m_radius;
 
 		Color m_ambientColor;
 		Color m_diffuseColor;
 		Color m_specularColor;
 
+		float m_ambientIntensity;
+		float m_diffuseIntensity;
+
 		bool m_isActive;
+	};
+
+	class PointLight : public Light
+	{
+	public:
+		PointLight();
+
+		void SetPosition(const Vec3 &pos);
+		const Vec3 & GetPosition();
+
+
+
+	private:
+		Vec3 &m_pos;
+
+		float m_radius；
 	};
 
 }

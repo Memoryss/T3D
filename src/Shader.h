@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <math.h>
 
 #include <Vector.h>
 #include <Matrix.h>
@@ -17,12 +18,20 @@ namespace T3D {
 
 	class Texture;
 
-	enum ShaderConstant
+	enum ShaderVec4Constant
 	{
-		SC_CameraPos = 0,
-		ShaderConstant_Count = 16,
+		SV4C_CameraPos = 0,
+		SV4C_SpecularPower,
+		ShaderVec4Constant_Count,
 	};
 	
+	enum ShaderFloatConstant
+	{
+		SFC_SpecularPower = 0,
+		SFC_SpecularIntensity,
+		ShaderFloatConstant_Count,
+	};
+
 	enum ShaderMatrix
 	{
 		SM_WorldViewProj = 0,
@@ -56,14 +65,58 @@ namespace T3D {
 		}
 
 	private:
-		//平行光  没有衰减参数
-		static inline void calcDirectionalLight()
-		{
 
+		static inline Color calcInternalLight(Vec3 &lightDir, Vec3 &wPos, Vec3 &normal)
+
+		//平行光  没有衰减参数
+		static inline Color calcDirectionalLight(Light *light, Vec3 &wPos, Vec3 &normal)
+		{
+			Color ambientColor = light->GetAmbientColor();  //环境光是均衡的，与法线和角度无关
+			ambientColor *= light->GetAmbientIntensity();
+			float diffuseFactor = normal.Dot(light->GetPosition());
+
+			Color diffuseColor(0.f, 0.f, 0.f, 0.f);
+			Color specularColor(0.f, 0.f, 0.f, 0.f);
+			if (diffuseFactor > 0)
+			{
+				diffuseColor = light->GetDiffuseColor();
+				diffuseColor *= light->GetDiffuseIntensity() * diffuseFactor;
+
+				Vec3 vertexToEye = g_shaderVec4Contants[SV4C_CameraPos].XYZ - wPos;  //获得顶点到相机的向量
+				vertexToEye.Normalize(); 
+
+				Vec3 reflectDir = reflect(light->GetDirection(), normal);  //获得反射的向量
+				reflectDir.Normalize();
+			
+				float specularFactor = vertexToEye.Dot(reflectDir);
+				if (specularFactor > 0)
+				{
+					specularFactor = pow(specularFactor, g_shaderFloatContants[SFC_SpecularPower]);
+					specularColor = light->GetSpecularColor();
+					specularColor *= specularFactor * g_shaderFloatContants[SFC_SpecularIntensity];
+				}
+			}
+
+			return specularColor + diffuseColor + ambientColor;
+		}
+
+		//点光源
+		static inline Color calcPointLight(Light *light, Vec3 &wPos, Vec3 &nor)
+		{
+			Vec3 lightDir = wPos - light->GetPosition();  //获得光源指向顶点的向量
+			float distance = lightDir.Normalize();
+		}
+
+		//返回反射向量 参数 入射向量和法线向量
+		static inline Vec3 reflect(const Vec3 &dir, const Vec3 &nor)
+		{
+			float temp = 2 * dir.Dot(nor);
+			return dir - nor * temp;
 		}
 
 	public:
-		static Vec4 g_shaderContants[ShaderConstant_Count];
+		static Vec4 g_shaderVec4Contants[ShaderVec4Constant_Count];
+		static float g_shaderFloatContants[ShaderFloatConstant_Count];
 		static std::vector<Matrix44> g_matrixs;
 		static std::vector<Texture *> g_textures;
 		static std::vector<Light *> g_lights;

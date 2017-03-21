@@ -72,4 +72,23 @@ namespace T3D {
 		return m_specularColor;
 	}
 
+	float Light::GetAmbientIntensity()
+	{
+		return m_ambientIntensity;
+	}
+
+	void Light::SetAmbientIntensity(float intensity)
+	{
+		m_ambientIntensity = intensity;
+	}
+
+	float Light::GetDiffuseIntensity()
+	{
+		return m_diffuseIntensity;
+	}
+
+	void Light::SetDiffuseIntensity(float intensity)
+	{
+		m_diffuseIntensity = intensity;
+	}
 }
