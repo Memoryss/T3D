@@ -107,6 +107,16 @@ namespace T3D {
 		return m_pos;
 	}
 
+	const Attenuation & PointLight::GetAttenuation()
+	{
+		return m_atten;
+	}
+
+	void PointLight::SetAttenuation(const Attenuation & atten)
+	{
+		m_atten = atten;
+	}
+
 	DirectionLight::DirectionLight() : Light(Light_Direction)
 	{
 
@@ -120,5 +130,24 @@ namespace T3D {
 	void DirectionLight::SetDirection(const Vec3 &dir)
 	{
 		m_dir = dir;
+	}
+	SpotLight::SpotLight() : Light(Light_Spot)
+	{
+	}
+	void SpotLight::SetDirection(const Vec3 & dir)
+	{
+		m_dir = dir;
+	}
+	const Vec3 & SpotLight::GetDirection()
+	{
+		return m_dir;
+	}
+	void SpotLight::SetCutoff(float cutoff)
+	{
+		m_cutoff = cutoff;
+	}
+	float SpotLight::GetCutoff()
+	{
+		return m_cutoff;
 	}
 }

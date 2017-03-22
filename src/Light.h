@@ -65,6 +65,14 @@ namespace T3D{
 		bool m_isActive;
 	};
 
+	struct Attenuation
+	{
+		//点光源的衰减
+		float m_constant;
+		float m_linear;
+		float m_exp;
+	};
+
 	class PointLight : public Light
 	{
 	public:
@@ -73,10 +81,13 @@ namespace T3D{
 		void SetPosition(const Vec3 &pos);
 		const Vec3 & GetPosition();
 
-
+		const Attenuation & GetAttenuation();
+		void SetAttenuation(const Attenuation &atten);
 
 	private:
 		Vec3 m_pos;
+
+		Attenuation m_atten;
 
 		//float m_radius；
 	};
@@ -91,6 +102,23 @@ namespace T3D{
 
 	private:
 		Vec3 m_dir;
+	};
+
+	class SpotLight : public Light
+	{
+	public:
+		SpotLight();
+
+		void SetDirection(const Vec3 &dir);
+		const Vec3 & GetDirection();
+
+		void SetCutoff(float cutoff);
+		float GetCutoff();
+
+	private:
+
+		Vec3 m_dir;
+		float m_cutoff;
 	};
 
 }
