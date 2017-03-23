@@ -66,14 +66,11 @@ namespace T3D {
 
 	private:
 
-		static inline Color calcInternalLight(Vec3 &lightDir, Vec3 &wPos, Vec3 &normal)
-
-		//平行光  没有衰减参数
-		static inline Color calcDirectionalLight(Light *light, Vec3 &wPos, Vec3 &normal)
+		static inline Color calcInternalLight(Light *light, const Vec3 &dir, const Vec3 &wPos, const Vec3 &normal)
 		{
 			Color ambientColor = light->GetAmbientColor();  //环境光是均衡的，与法线和角度无关
 			ambientColor *= light->GetAmbientIntensity();
-			float diffuseFactor = normal.Dot(light->GetPosition());
+			float diffuseFactor = normal.Dot(-dir);
 
 			Color diffuseColor(0.f, 0.f, 0.f, 0.f);
 			Color specularColor(0.f, 0.f, 0.f, 0.f);
@@ -83,11 +80,11 @@ namespace T3D {
 				diffuseColor *= light->GetDiffuseIntensity() * diffuseFactor;
 
 				Vec3 vertexToEye = g_shaderVec4Contants[SV4C_CameraPos].XYZ - wPos;  //获得顶点到相机的向量
-				vertexToEye.Normalize(); 
+				vertexToEye.Normalize();
 
 				Vec3 reflectDir = reflect(light->GetDirection(), normal);  //获得反射的向量
 				reflectDir.Normalize();
-			
+
 				float specularFactor = vertexToEye.Dot(reflectDir);
 				if (specularFactor > 0)
 				{
@@ -100,11 +97,42 @@ namespace T3D {
 			return specularColor + diffuseColor + ambientColor;
 		}
 
+		//平行光  没有衰减参数
+		static inline Color calcDirectionalLight(DirectionLight *light, const Vec3 &wPos, const Vec3 &normal)
+		{
+			return calcInternalLight(light, light->GetDirection(), wPos, normal);
+		}
+
 		//点光源
-		static inline Color calcPointLight(Light *light, Vec3 &wPos, Vec3 &nor)
+		static inline Color calcPointLight(PointLight *light, const Vec3 &wPos, const Vec3 &nor)
 		{
 			Vec3 lightDir = wPos - light->GetPosition();  //获得光源指向顶点的向量
 			float distance = lightDir.Normalize();
+
+			Color color = calcInternalLight(light, lightDir, wPos, nor); //如果不衰减就是这个color
+			
+			//根据距离计算衰减
+			auto &att = light->GetAttenuation();
+			float attenuation = att.m_constant + att.m_linear * distance + att.m_exp * distance * distance;
+			return color / attenuation;
+		}
+
+		//聚光灯  超出范围外不计算  范围内作为点光源计算
+		static inline Color calcSpotLight(SpotLight *light, const Vec3 &wPos, const Vec3 &nor)
+		{
+			Vec3 lightToPoint = wPos - light->GetPosition();
+			lightToPoint.Normalize();
+
+			float spotFactor = lightToPoint.Dot(light->GetDirection());
+			if (spotFactor > light->GetCutoff())
+			{
+				Color color = calcPointLight(light, wPos, nor);
+				return color * (1 - (1 - spotFactor) / (1 - light->GetCutoff()));
+			}
+			else
+			{
+				return Color(0.f, 0.f, 0.f, 0.f);
+			}
 		}
 
 		//返回反射向量 参数 入射向量和法线向量

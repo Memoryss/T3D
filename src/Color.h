@@ -55,6 +55,26 @@ namespace T3D {
 			return *this;
 		}
 
+		inline Color & operator / (float scale)
+		{
+			r /= scale;
+			g /= scale;
+			b /= scale;
+			a /= scale;
+
+			return *this;
+		}
+
+		inline Color & operator /= (float scale)
+		{
+			r /= scale;
+			g /= scale;
+			b /= scale;
+			a /= scale;
+
+			return *this;
+		}
+
 	public:
 		float r = 1.0f;
 		float g = 1.0f;

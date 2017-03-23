@@ -104,7 +104,7 @@ namespace T3D{
 		Vec3 m_dir;
 	};
 
-	class SpotLight : public Light
+	class SpotLight : public PointLight
 	{
 	public:
 		SpotLight();
@@ -118,7 +118,7 @@ namespace T3D{
 	private:
 
 		Vec3 m_dir;
-		float m_cutoff;
+		float m_cutoff;  //º–Ω«µƒ”‡œ“÷µ
 	};
 
 }
