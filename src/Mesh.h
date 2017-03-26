@@ -6,6 +6,7 @@
 
 #include <Vector.h>
 #include "Color.h"
+#include "Material.h"
 
 typedef unsigned int uint32;
 
@@ -29,15 +30,15 @@ namespace T3D {
 	};
 
 	//图元
-	struct Face
+	struct Primitive
 	{
-		Face():m_indices(NULL), m_numIndices(0){}
+		Primitive():m_indices(NULL), m_numIndices(0){}
 
-		~Face() { delete[]m_indices; }
+		~Primitive() { delete[]m_indices; }
 
-		Face(const Face &f) : m_indices(NULL) { *this = f; }
+		Primitive(const Primitive &f) : m_indices(NULL) { *this = f; }
 
-		Face & operator=(const Face &f ) {
+		Primitive & operator=(const Primitive &f ) {
 			if (&f == this) {
 				return *this;
 			}
@@ -55,7 +56,7 @@ namespace T3D {
 			return *this;
 		}
 
-		bool operator==(const Face &f) {
+		bool operator==(const Primitive &f) {
 			if (m_indices == f.m_indices)return true;
 			else if (m_indices && m_numIndices == f.m_numIndices)
 			{
@@ -66,8 +67,8 @@ namespace T3D {
 			return false;
 		}
 
-		uint32 m_numIndices;
-		uint32 *m_indices;
+		uint32 m_numIndices;  //图元索引的个数
+		uint32 *m_indices;    //图元顶点索引
 	};
 
 	class Mesh
@@ -87,9 +88,10 @@ namespace T3D {
 		Vertex *m_vertics;
 		uint32 m_numVertices;
 
-		Face *m_faces;
-		uint32 m_numFaces;
+		Primitive *m_primitives;
+		uint32 m_numPrimitives;
 
+		Material *m_materials; //材质
 	};
 
 }

@@ -6,6 +6,8 @@
 #include <assimp/material.h>
 #include <string>
 
+#include "Resource.h"
+
 typedef unsigned int uint32;
 typedef unsigned char uint8;
 
@@ -33,17 +35,13 @@ namespace T3D {
 	};
 
 
-	class Texture
+	class Texture : public Resource
 	{
 	public:
 
 		Texture(const char *filename, aiTextureType type);
 
-		Texture();
-
-		void SetPathAndType(const char *filepath, aiTextureType type);
-
-		void ReadFile();
+		void ReadFile(const char *path);
 
 		~Texture()
 		{
@@ -70,7 +68,6 @@ namespace T3D {
 		uint32 m_byteCount;   //每个像素的字节数  1 黑白图 4 8 24 32等
 		uint32 m_pitch;
 
-		std::string m_filename;
 		aiTextureType m_type; //纹理类型
 
 		uint8 *m_rawData;

@@ -33,7 +33,7 @@ namespace T3D {
 
 		void processMesh(aiMesh *mesh, const aiScene *scene);
 
-		void loadMatrixTextures(aiMaterial *material, aiTextureType type);
+		void loadMatrixTextures(aiMaterial *material, aiTextureType type, Mesh &mesh);
 
 	private:
 		std::vector <Mesh> m_meshs; //模型数据 

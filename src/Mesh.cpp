@@ -34,7 +34,7 @@ namespace T3D {
 		}
 	}
 
-	Mesh::Mesh() : m_numVertices(0), m_numFaces(0), m_vertics(NULL), m_faces(NULL)
+	Mesh::Mesh() : m_numVertices(0), m_numPrimitives(0), m_vertics(NULL), m_primitives(NULL)
 	{
 
 	}
@@ -42,7 +42,7 @@ namespace T3D {
 	Mesh::~Mesh()
 	{
 		delete[]m_vertics;
-		delete[]m_faces;
+		delete[]m_primitives;
 
 	}
 

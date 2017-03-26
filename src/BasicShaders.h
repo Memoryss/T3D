@@ -14,7 +14,7 @@ namespace T3D {
 		~FlatShader() {}
 
 		virtual void ProcessVertex(uint8* vOut, const uint8 vInRef) override;
-
+		virtual void ProcessFragment(uint8 *rOut, const uint8 *rIn) override;
 	};
 
 }

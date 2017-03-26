@@ -10,9 +10,7 @@ namespace T3D {
 	{
 	public:
 
-		static bool Clip_Line();
-		static bool Draw_Line();
-		static bool Draw_Clip_Line();
+		static bool DrawLine()
 
 	private:
 		std::list <Face*> m_rendFaces;

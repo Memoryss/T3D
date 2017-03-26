@@ -9,26 +9,15 @@
 
 namespace T3D {
 
-	Texture::Texture() : m_data(NULL), m_width(0), m_height(0), m_rawData(NULL), m_byteCount(0), m_pitch(0)
-	{ 
-
-	}
-
-	Texture::Texture(const char *filepath, aiTextureType type) : m_filename(filepath), m_data(NULL), m_width(0), m_height(0), m_rawData(NULL), m_byteCount(0), m_pitch(0), m_type(type)
+	Texture::Texture(const char *filename, aiTextureType type) : Resource(filename, RT_Texture), m_data(NULL), m_width(0), m_height(0), m_rawData(NULL), m_byteCount(0), m_pitch(0), m_type(type)
 	{
 		
 	}
 
-	void Texture::SetPathAndType(const char *path, aiTextureType type)
-	{
-		m_filename = path;
-		m_type = type;
-	}
-
-	void Texture::ReadFile()
+	void Texture::ReadFile(const char *path)
 	{
 		TFile texFile;
-		texFile.Open(m_filename.c_str());
+		texFile.Open(path);
 		if (texFile.IsOpen())
 		{
 			const uint8 *start = texFile.GetData();
@@ -60,7 +49,7 @@ namespace T3D {
 		}
 		else
 		{
-			LOG(ERROR) << "Bitmap load failed, path=" << m_filename;
+			LOG(ERROR) << "Bitmap load failed, path=" << path;
 			m_rawData = 0;
 		}
 	}

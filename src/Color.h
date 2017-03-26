@@ -75,6 +75,16 @@ namespace T3D {
 			return *this;
 		}
 
+		inline Color & operator = (const Color &rhs)
+		{
+			r = rhs.r;
+			g = rhs.g;
+			b = rhs.b;
+			a = rhs.a;
+
+			return *this;
+		}
+
 	public:
 		float r = 1.0f;
 		float g = 1.0f;

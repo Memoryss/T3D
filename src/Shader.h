@@ -45,22 +45,28 @@ namespace T3D {
 	{
 	public:
 		virtual void ProcessVertex(uint8* vOut, const uint8 vInRef) = 0;
-		virtual void ProcessRasterize() = 0;
-		virtual void ProcessPixel() = 0;
+		virtual void ProcessFragment(uint8 *vOut, const uint8 *vIn) = 0;
 
 	protected:
-		static inline void calcLights(Vec3 &wPos, Vec3 &norDir, Vec3 &viewDir, Vec4 &diffuseAcc, Vec4 &specularAcc)
+		static inline void calcLights(Vec3 &wPos, Vec3 &norDir, Color &color)
 		{
 			for (uint32 index = 0; index < g_lights.size(); ++index)
 			{
 				Light *lt = g_lights[index];
-				Vec3 lightPos = lt->GetPosition();
-				Vec3 lightDir = lightPos - wPos;
-				lightDir.Normalize();
-
-				float diffuse; //Âþ·´Éä
-				float specular;  //¾µÃæ·´Éä
-				Vec3 dir = lt->GetDirection();
+				switch (lt->GetLightType())
+				{
+				case Light_Direction:
+					color += calcDirectionalLight(static_cast<DirectionLight*>(lt), wPos, norDir);
+					break;
+				case Light_Point:
+					color += calcPointLight(static_cast<PointLight*>(lt), wPos, norDir);
+					break;
+				case Light_Spot:
+					color += calcSpotLight(static_cast<SpotLight*>(lt), wPos, norDir);
+					break;
+				default:
+					break;
+				}
 			}
 		}
 

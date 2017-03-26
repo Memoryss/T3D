@@ -79,25 +79,26 @@ namespace T3D {
 			tmesh.m_vertics[i].SetData(mesh, i);
 		}
 
-		tmesh.m_numFaces = mesh->mNumFaces;
-		tmesh.m_faces = new Face[mesh->mNumFaces];
+		tmesh.m_numPrimitives = mesh->mNumFaces;
+		tmesh.m_primitives = new Primitive[mesh->mNumFaces];
 		for (uint32 i = 0; i < mesh->mNumFaces; ++i)
 		{
 			//设置面数据
 			const auto &face = mesh->mFaces[i];
-			tmesh.m_faces[i].m_numIndices = face.mNumIndices;
-			tmesh.m_faces[i].m_indices = new uint32[face.mNumIndices];
+			tmesh.m_primitives[i].m_numIndices = face.mNumIndices;
+			tmesh.m_primitives[i].m_indices = new uint32[face.mNumIndices];
 			for (uint32 j = 0; j < face.mNumIndices; ++j)
 			{
-				tmesh.m_faces[i].m_indices[j] = face.mIndices[j];
+				tmesh.m_primitives[i].m_indices[j] = face.mIndices[j];
 			}
 		}
 
 		if (mesh->mMaterialIndex >= 0)
 		{
 			aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
-			loadMatrixTextures(material, aiTextureType_DIFFUSE); //diffuse贴图
-			loadMatrixTextures(material, aiTextureType_SPECULAR);
+			loadMatrixTextures(material, aiTextureType_DIFFUSE, tmesh); //diffuse贴图 TODO其他贴图
+			loadMatrixTextures(material, aiTextureType_SPECULAR, tmesh);
+			loadMatrixTextures(material, aiTextureType_AMBIENT, tmesh);
 		}
 	}
 
@@ -110,7 +111,7 @@ namespace T3D {
 		}
 	}
 
-	void Model::loadMatrixTextures(aiMaterial *material, aiTextureType type)
+	void Model::loadMatrixTextures(aiMaterial *material, aiTextureType type, Mesh &mesh)
 	{
 		for (uint32 i = 0; i < material->GetTextureCount(type); ++i)
 		{
