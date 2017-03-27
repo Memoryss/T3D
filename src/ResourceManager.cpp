@@ -1,5 +1,7 @@
 #include "ResourceManager.h"
 
+#include <assert.h>
+
 #include "Texture.h"
 #include "Material.h"
 
@@ -27,6 +29,37 @@ namespace T3D {
 		}
 	}
 
-	Texture * ResourceManager::LoadMaterial()
+	const char * ResourceManager::GetResourcePath()
+	{
+		return m_path.c_str();
+	}
+
+	ResourceManager * ResourceManager::Instance(const char *path)
+	{
+		if (s_instance == NULL) 
+		{
+			s_instance = new ResourceManager(path);
+		}
+
+		return s_instance;
+	}
+
+	const Texture * ResourceManager::LoadTexture(const char *filename)
+	{
+		auto iter = m_textures.find(filename);
+		if (iter != m_textures.end())
+		{
+			return static_cast<Texture*>(iter->second);
+		}
+
+		auto texture = new Texture(filename);
+		std::string 
+		texture->ReadFile()
+	}
+
+	const Material * ResourceManager::LoadMaterial(const char *filename)
+	{
+
+	}
 
 }

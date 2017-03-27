@@ -17,14 +17,19 @@ namespace T3D{
 	class ResourceManager
 	{
 	public:
-		ResourceManager(const char *path);
+		
 		virtual ~ResourceManager();
 
-		static ResourceManager * Instance();
+		static ResourceManager * Instance(const char *path);
 
 		virtual const Texture* LoadTexture(const char *filename);
 
 		virtual const Material* LoadMaterial(const char *filename);
+
+		const char * GetResourcePath();
+
+	protected:
+		ResourceManager(const char *path);
 
 	private:
 

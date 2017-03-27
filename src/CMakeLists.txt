@@ -28,6 +28,8 @@ set (PUB_HDR
 	T3DRasterizer.h
 	Rasterizer.h
 	Renderer.h
+	Resource.h
+	ResourceManager.h
 )
 
 add_library(T3DEngine
@@ -51,6 +53,7 @@ add_library(T3DEngine
 	T3DRasterizer.cpp
 	Rasterizer.cpp
 	Renderer.cpp
+	ResourceManager.cpp
 	${PUB_HDR}
 )
 

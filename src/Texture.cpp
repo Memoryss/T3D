@@ -6,10 +6,11 @@
 #include <glog/logging.h>
 #include <TMath.h>
 #include "TFile.h"
+#include "ResourceManager.h"
 
 namespace T3D {
 
-	Texture::Texture(const char *filename, aiTextureType type) : Resource(filename, RT_Texture), m_data(NULL), m_width(0), m_height(0), m_rawData(NULL), m_byteCount(0), m_pitch(0), m_type(type)
+	Texture::Texture(const char *filename) : Resource(filename, RT_Texture), m_data(NULL), m_width(0), m_height(0), m_rawData(NULL), m_byteCount(0), m_pitch(0)
 	{
 		
 	}
