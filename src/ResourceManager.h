@@ -20,13 +20,16 @@ namespace T3D{
 		
 		virtual ~ResourceManager();
 
-		static ResourceManager * Instance(const char *path);
+		static ResourceManager * Instance();
 
 		virtual const Texture* LoadTexture(const char *filename);
 
 		virtual const Material* LoadMaterial(const char *filename);
 
+		void SetResourcePath(const char *path);
 		const char * GetResourcePath();
+
+		std::string GetAbsolutePath(const char *relative);
 
 	protected:
 		ResourceManager(const char *path);

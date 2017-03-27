@@ -21,7 +21,7 @@ namespace T3D {
 	public:
 		Model();
 
-		void LoadModel(const char *path);
+		void LoadModel(const char *name, const char *meshFilepath, const char *materialFilepath);
 
 		virtual void Update() override;
 
@@ -35,10 +35,12 @@ namespace T3D {
 
 		void loadMatrixTextures(aiMaterial *material, aiTextureType type, Mesh &mesh);
 
+		void loadMaterial(const char *path);
+
 	private:
 		std::vector <Mesh> m_meshs; //模型数据 
 		std::map <std::string, Texture*> m_textures; //纹理数据
-		std::string m_filename;
+		std::string m_name;
 
 		Matrix44 m_worldMatrix;
 	};

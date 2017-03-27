@@ -29,16 +29,30 @@ namespace T3D {
 		}
 	}
 
+	void ResourceManager::SetResourcePath(const char * path)
+	{
+		m_path = path;
+	}
+
 	const char * ResourceManager::GetResourcePath()
 	{
 		return m_path.c_str();
 	}
 
-	ResourceManager * ResourceManager::Instance(const char *path)
+	std::string ResourceManager::GetAbsolutePath(const char * relative)
+	{
+		std::string path(m_path);
+		path.append("/");
+		path.append(relative);
+
+		return path;
+	}
+
+	ResourceManager * ResourceManager::Instance()
 	{
 		if (s_instance == NULL) 
 		{
-			s_instance = new ResourceManager(path);
+			s_instance = new ResourceManager(".");
 		}
 
 		return s_instance;
@@ -53,13 +67,20 @@ namespace T3D {
 		}
 
 		auto texture = new Texture(filename);
-		std::string 
-		texture->ReadFile()
+		std::string texPath(m_path);
+		m_path.append("/");
+		texture->ReadFile(texPath.append(filename).c_str());
+
+		m_textures[filename] = texture;
 	}
 
 	const Material * ResourceManager::LoadMaterial(const char *filename)
 	{
-
+		auto iter = m_materials.find(filename);
+		if (iter != m_materials.end())
+		{
+			return static_cast<Material*>(iter->second);
+		}
 	}
 
 }

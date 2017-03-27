@@ -1,10 +1,14 @@
 #include "Model.h"
 
+#include <tchar.h>
+
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
-
 #include <glog/logging.h>
+
+#include "ResourceManager.h"
+#include "TFile.h"
 
 namespace T3D {
 
@@ -13,15 +17,17 @@ namespace T3D {
 		
 	}
 
-	void Model::LoadModel(const char *path)
+	void Model::LoadModel(const char *name, const char *meshFilepath, const char *materialFilepath)
 	{
-		m_filename = path;
+		m_name = name;
 
 		Assimp::Importer importer;
 		//flag 转化为三角形，生成法线，合并mesh
-		const aiScene *scene = importer.ReadFile(m_filename, aiProcess_Triangulate | aiProcess_GenNormals | aiProcess_OptimizeMeshes);
+		std::string meshPath = ResourceManager::Instance()->GetAbsolutePath(meshFilepath);
+		std::string materialPath = ResourceManager::Instance()->GetAbsolutePath(materialFilepath);
+		const aiScene *scene = importer.ReadFile(meshPath, aiProcess_Triangulate | aiProcess_GenNormals | aiProcess_OptimizeMeshes);
 		if (scene == NULL || scene->mFlags == AI_SCENE_FLAGS_INCOMPLETE || scene->mRootNode == NULL) {
-			LOG(ERROR) << "Load Modeo:" << m_filename << " failed, reason:" << importer.GetErrorString();
+			LOG(ERROR) << "Load Modeo:" << m_name << " failed, reason:" << importer.GetErrorString();
 			return;
 		}
 
@@ -126,6 +132,37 @@ namespace T3D {
 			}
 			
 			m_textures[path.C_Str()] = texture;
+		}
+	}
+
+	void Model::loadMaterial(const char * path)
+	{
+		Material *material = NULL;
+
+		TFile materialFile;
+		materialFile.Open(path);
+		if (materialFile.IsOpen())
+		{
+			std::string strLine;
+			std::stringstream inFile((const char *)materialFile.GetData());
+			while (true)
+			{
+				inFile >> strLine;
+				if (!inFile) break;
+
+				if (0 == _tcscmp(strLine.c_str(), _T("#")));
+				else if (0 == _tcscmp(strLine.c_str(), _T("newmtl")))
+				{
+					std::string name;
+					inFile >> name;
+					material = new Material(name.c_str());
+				}
+				else if (0 == _tcscmp(strLine, _T("shading")))
+			}
+		}
+		else
+		{
+			LOG(ERROR) << "Material load failed, path=" << path;
 		}
 	}
 }
