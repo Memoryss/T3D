@@ -25,6 +25,10 @@ namespace T3D {
 		float m_sharpness = 500; //清晰度  0~1000 越大越清晰
 		float m_ni = 1.0; //折射度   0.001 ~ 10   1.0光通过的不发生弯曲  玻璃的折射率是1.5
 
+		std::string m_mapKd; 
+		std::string m_mapKa;
+		std::string m_mapKs;
+
 		std::vector<Texture *> m_textures;
 	};
 

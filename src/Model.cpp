@@ -157,7 +157,35 @@ namespace T3D {
 					inFile >> name;
 					material = new Material(name.c_str());
 				}
-				else if (0 == _tcscmp(strLine, _T("shading")))
+				else if (0 == _tcscmp(strLine.c_str(), _T("Ka")))
+				{
+					inFile >> material->m_ambientColor.r >> material->m_ambientColor.g >> material->m_ambientColor.b;
+				}
+				else if (0 == _tcscmp(strLine.c_str(), _T("Kd")))
+				{
+					inFile >> material->m_diffuseColor.r >> material->m_diffuseColor.g >> material->m_diffuseColor.b;
+				}
+				else if (0 == _tcscmp(strLine.c_str(), _T("Ks")))
+				{
+					inFile >> material->m_specularColor.r >> material->m_specularColor.g >> material->m_specularColor.b;
+				}
+				else if (0 == _tcscmp(strLine.c_str(), _T("Ns")))
+				{
+					inFile >> material->m_ns;
+				}
+				else if (0 == _tcscmp(strLine.c_str(), _T("map_Kd")))
+				{
+					inFile >> material->m_mapKd;
+				}
+				else if (0 == _tcscmp(strLine.c_str(), _T("map_Ks")))
+				{
+					inFile >> material->m_mapKs;
+				}
+				else if (0 == _tcscmp(strLine.c_str(), _T("map_Ka")))
+				{
+					inFile >> material->m_mapKa;
+				}
+				else if (0 == _tcscmp(strLine.c_str(), _T()))
 			}
 		}
 		else

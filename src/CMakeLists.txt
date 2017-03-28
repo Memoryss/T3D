@@ -37,6 +37,7 @@ add_library(T3DEngine
 	Texture.cpp
 	Model.cpp
 	Mesh.cpp
+	Material.cpp
 	Camera.cpp
 	Vertex.cpp
 	Node.cpp
