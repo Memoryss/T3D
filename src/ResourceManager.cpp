@@ -2,6 +2,8 @@
 
 #include <assert.h>
 
+#include <glog/logging.h>
+
 #include "Texture.h"
 #include "Material.h"
 
@@ -58,11 +60,12 @@ namespace T3D {
 		return s_instance;
 	}
 
-	const Texture * ResourceManager::LoadTexture(const char *filename)
+	Texture * ResourceManager::LoadTexture(const char *filename)
 	{
 		auto iter = m_textures.find(filename);
 		if (iter != m_textures.end())
 		{
+			LOG(WARNING) << "Texture has been loaded ,name=" << filename;
 			return static_cast<Texture*>(iter->second);
 		}
 
@@ -72,9 +75,10 @@ namespace T3D {
 		texture->ReadFile(texPath.append(filename).c_str());
 
 		m_textures[filename] = texture;
+		return texture;
 	}
 
-	const Material * ResourceManager::LoadMaterial(const char *filename)
+	Material * ResourceManager::LoadMaterial(const char *filename)
 	{
 		auto iter = m_materials.find(filename);
 		if (iter != m_materials.end())

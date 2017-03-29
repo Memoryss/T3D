@@ -26,6 +26,7 @@ set (PUB_HDR
 	T3DDevice.h
 	T3DWindow.h
 	T3DRasterizer.h
+	TFile.h
 	Rasterizer.h
 	Renderer.h
 	Resource.h
@@ -52,6 +53,7 @@ add_library(T3DEngine
 	T3DDevice.cpp
 	T3DWindow.cpp
 	T3DRasterizer.cpp
+	TFile.cpp
 	Rasterizer.cpp
 	Renderer.cpp
 	ResourceManager.cpp

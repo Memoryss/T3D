@@ -123,4 +123,24 @@ namespace T3D {
 		return m_isOpen;
 	}
 
+	uint32 TFile::Count(const char * keys)
+	{
+		std::string temp((const char *)m_data);
+
+		uint32 size = strlen(keys);
+		uint32 count = 0;
+		uint32 index = 0;
+		while (index < temp.size())
+		{
+			size_t pos = temp.find(keys, index);
+			if (pos != temp.npos)
+			{
+				index = pos + size;
+				++count;
+			}
+		}
+		
+		return count;
+	}
+
 }

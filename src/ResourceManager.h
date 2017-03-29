@@ -22,9 +22,9 @@ namespace T3D{
 
 		static ResourceManager * Instance();
 
-		virtual const Texture* LoadTexture(const char *filename);
+		virtual Texture* LoadTexture(const char *filename);
 
-		virtual const Material* LoadMaterial(const char *filename);
+		virtual Material* LoadMaterial(const char *filename);
 
 		void SetResourcePath(const char *path);
 		const char * GetResourcePath();

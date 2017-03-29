@@ -21,7 +21,7 @@ namespace T3D {
 	public:
 		Model();
 
-		void LoadModel(const char *name, const char *meshFilepath, const char *materialFilepath);
+		void LoadModel(const char *name, const char *modelFilepath);
 
 		virtual void Update() override;
 
@@ -31,11 +31,12 @@ namespace T3D {
 
 		void processNode(aiNode *node, const aiScene *scene);
 
+		//转换material为本地数据结构
+		void processMaterial(const aiScene *scene);
+
 		void processMesh(aiMesh *mesh, const aiScene *scene);
 
-		void loadMatrixTextures(aiMaterial *material, aiTextureType type, Mesh &mesh);
-
-		void loadMaterial(const char *path);
+		void loadTexture(aiMaterial *material, aiTextureType type);
 
 	private:
 		std::vector <Mesh> m_meshs; //模型数据 

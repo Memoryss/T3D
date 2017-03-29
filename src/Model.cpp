@@ -5,6 +5,8 @@
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
+#include <assimp/color4.h>
+
 #include <glog/logging.h>
 
 #include "ResourceManager.h"
@@ -17,14 +19,13 @@ namespace T3D {
 		
 	}
 
-	void Model::LoadModel(const char *name, const char *meshFilepath, const char *materialFilepath)
+	void Model::LoadModel(const char *name, const char *modelFilepath)
 	{
 		m_name = name;
 
 		Assimp::Importer importer;
 		//flag 转化为三角形，生成法线，合并mesh
-		std::string meshPath = ResourceManager::Instance()->GetAbsolutePath(meshFilepath);
-		std::string materialPath = ResourceManager::Instance()->GetAbsolutePath(materialFilepath);
+		std::string meshPath = ResourceManager::Instance()->GetAbsolutePath(modelFilepath);
 		const aiScene *scene = importer.ReadFile(meshPath, aiProcess_Triangulate | aiProcess_GenNormals | aiProcess_OptimizeMeshes);
 		if (scene == NULL || scene->mFlags == AI_SCENE_FLAGS_INCOMPLETE || scene->mRootNode == NULL) {
 			LOG(ERROR) << "Load Modeo:" << m_name << " failed, reason:" << importer.GetErrorString();
@@ -102,9 +103,9 @@ namespace T3D {
 		if (mesh->mMaterialIndex >= 0)
 		{
 			aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
-			loadMatrixTextures(material, aiTextureType_DIFFUSE, tmesh); //diffuse贴图 TODO其他贴图
-			loadMatrixTextures(material, aiTextureType_SPECULAR, tmesh);
-			loadMatrixTextures(material, aiTextureType_AMBIENT, tmesh);
+			processMaterial(material, aiTextureType_DIFFUSE, tmesh); //diffuse贴图 TODO其他贴图
+			processMaterial(material, aiTextureType_SPECULAR, tmesh);
+			processMaterial(material, aiTextureType_AMBIENT, tmesh);
 		}
 	}
 
@@ -117,26 +118,52 @@ namespace T3D {
 		}
 	}
 
-	void Model::loadMatrixTextures(aiMaterial *material, aiTextureType type, Mesh &mesh)
+	void Model::processMaterial(const aiScene *scene)
+	{
+		for (uint32 mIndex = 0; mIndex < scene->mNumMaterials; ++mIndex)
+		{
+			aiMaterial *material = scene->mMaterials[mIndex];
+
+			int fill_mode;
+			int ret1, ret2;
+			aiColor4D diffuse;
+			aiColor4D specular;
+			aiColor4D ambient;
+			aiColor4D emission;
+			float shininess, strength;
+			int two_sided;
+			int wireframe;
+			uint32 max;
+			material->
+				if (AI_SUCCESS == aiGetMaterialColor(material, AI_MATKEY_COLOR_DIFFUSE, &diffuse))
+				{
+
+				}
+			material.
+				//加载纹理
+				int index = aiTextureType_NONE;
+			for (++index; index < aiTextureType_UNKNOWN; ++index)
+			{
+				loadTexture(material, (aiTextureType)index);
+			}
+		}
+	}
+	void Model::loadTexture(aiMaterial * material, aiTextureType type)
 	{
 		for (uint32 i = 0; i < material->GetTextureCount(type); ++i)
 		{
 			aiString path;
-			material->GetTexture(type, i, &path);
-			Texture *texture = new Texture(path.C_Str(), type);
-			auto iter = m_textures.find(path.C_Str());
-			if (iter != m_textures.end())
+			if (AI_SUCCESS == material->GetTexture(type, i, &path))
 			{
-				LOG(WARNING) << "Texture has been loaded ,name=" << path.C_Str();
-				break;
+				Texture *texture = ResourceManager::Instance()->LoadTexture(path.C_Str());
+				m_textures[path.C_Str()] = texture;
 			}
-			
-			m_textures[path.C_Str()] = texture;
 		}
 	}
-
+	/*
 	void Model::loadMaterial(const char * path)
 	{
+		std::vector<Material *> materials;
 		Material *material = NULL;
 
 		TFile materialFile;
@@ -150,47 +177,134 @@ namespace T3D {
 				inFile >> strLine;
 				if (!inFile) break;
 
-				if (0 == _tcscmp(strLine.c_str(), _T("#")));
-				else if (0 == _tcscmp(strLine.c_str(), _T("newmtl")))
+				if (0 == _tcscmp(strLine.c_str(), _T("#"))) continue;
+				if (0 == _tcscmp(strLine.c_str(), _T("\n"))) continue;
+
+				//new mtl
+				if (0 == _tcscmp(strLine.c_str(), _T("newmtl")))
 				{
+					if (material != NULL)
+					{
+						materials.push_back(material);  //将之前的material添加进数组中
+					}
+
 					std::string name;
 					inFile >> name;
 					material = new Material(name.c_str());
+					continue;
 				}
-				else if (0 == _tcscmp(strLine.c_str(), _T("Ka")))
+				
+				//ambient
+				if (0 == _tcscmp(strLine.c_str(), _T("Ka")))
 				{
-					inFile >> material->m_ambientColor.r >> material->m_ambientColor.g >> material->m_ambientColor.b;
+					inFile >> material->m_ambient.r >> material->m_ambient.g >> material->m_ambient.b;
+					continue;
 				}
-				else if (0 == _tcscmp(strLine.c_str(), _T("Kd")))
+				
+				// diffuse
+				if (0 == _tcscmp(strLine.c_str(), _T("Kd")))
 				{
-					inFile >> material->m_diffuseColor.r >> material->m_diffuseColor.g >> material->m_diffuseColor.b;
+					inFile >> material->m_diffuse.r >> material->m_diffuse.g >> material->m_diffuse.b;
+					continue;
 				}
-				else if (0 == _tcscmp(strLine.c_str(), _T("Ks")))
+				
+				// specular
+				if (0 == _tcscmp(strLine.c_str(), _T("Ks")))
 				{
-					inFile >> material->m_specularColor.r >> material->m_specularColor.g >> material->m_specularColor.b;
+					inFile >> material->m_specular.r >> material->m_specular.g >> material->m_specular.b;
+					continue;
 				}
-				else if (0 == _tcscmp(strLine.c_str(), _T("Ns")))
+				
+				// transmittance
+				if (0 == _tcscmp(strLine.c_str(), _T("Tf")))
 				{
-					inFile >> material->m_ns;
+					inFile >> material->m_transmittance.r >> material->m_transmittance.g >> material->m_transmittance.b;
+					continue;
 				}
-				else if (0 == _tcscmp(strLine.c_str(), _T("map_Kd")))
+
+				// ior(index of refraction)
+				if (0 == _tcscmp(strLine.c_str(), _T("Ni")))
+				{
+					inFile >> material->m_ior;
+					continue;
+				}
+
+				//emission
+				if (0 == _tcscmp(strLine.c_str(), _T("Ke")))
+				{
+					inFile >> material->m_emission.r >> material->m_emission.g >> material->m_emission.b;
+					continue;
+				}
+
+				//shininess
+				if (0 == _tcscmp(strLine.c_str(), _T("Ns")))
+				{
+					inFile >> material->m_shininess;
+					continue;
+				}
+
+				//illum model
+				if (0 == _tcscmp(strLine.c_str(), _T("illum")))
+				{
+					inFile >> material->m_illum;
+					continue;
+				}
+				
+				//dissolve
+				if (0 == _tcscmp(strLine.c_str(), _T("d")))
+				{
+					inFile >> material->m_dissolve;
+					continue;
+				}
+				if (0 == _tcscmp(strLine.c_str(), _T("Tr")))
+				{
+					inFile >> material->m_dissolve;
+					material->m_dissolve = 1.f - material->m_dissolve;
+					continue;
+				}
+
+				// PBR: roughness
+				if (0 == _tcscmp(strLine.c_str(), _T("Pr")))
+				{
+					inFile >> material->m_roughness;
+					continue;
+				}
+
+				// PBR: metallic
+				if (0 == _tcscmp(strLine.c_str(), _T("Pm")))
+				{
+					inFile >> material->m_metallic;
+					continue;
+				}
+
+				// PBR: sheen
+				if (0 == _tcscmp(strLine.c_str(), _T("Ps")))
+				{
+					inFile >> material->m_sheen;
+					continue;
+				}
+
+				if (0 == _tcscmp(strLine.c_str(), _T("map_Kd")))
 				{
 					inFile >> material->m_mapKd;
 				}
-				else if (0 == _tcscmp(strLine.c_str(), _T("map_Ks")))
+				
+				if (0 == _tcscmp(strLine.c_str(), _T("map_Ks")))
 				{
 					inFile >> material->m_mapKs;
 				}
-				else if (0 == _tcscmp(strLine.c_str(), _T("map_Ka")))
+				
+				if (0 == _tcscmp(strLine.c_str(), _T("map_Ka")))
 				{
 					inFile >> material->m_mapKa;
 				}
-				else if (0 == _tcscmp(strLine.c_str(), _T()))
+				
+				if (0 == _tcscmp(strLine.c_str(), _T()))
 			}
 		}
 		else
 		{
 			LOG(ERROR) << "Material load failed, path=" << path;
 		}
-	}
+	}*/
 }

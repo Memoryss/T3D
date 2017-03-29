@@ -25,6 +25,7 @@ namespace T3D{
 
 		bool IsOpen() const;
 
+		uint32 Count(const char *keys);
 
 	private:
 		uint32 m_size;
