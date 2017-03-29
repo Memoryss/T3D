@@ -78,13 +78,31 @@ namespace T3D {
 		return texture;
 	}
 
-	Material * ResourceManager::LoadMaterial(const char *filename)
+	Texture * ResourceManager::GetTexture(const char * filename)
 	{
-		auto iter = m_materials.find(filename);
-		if (iter != m_materials.end())
+		auto iter = m_textures.find(filename);
+		if (iter != m_textures.end())
 		{
-			return static_cast<Material*>(iter->second);
+			return static_cast<Texture*>(iter->second);
 		}
+
+		LOG(WARNING) << "can't find texture, name=" << filename;
+		return NULL;
+	}
+
+	Material * ResourceManager::AddMaterial()
+	{
+		//TODO使用索引作为名称
+		Material *mtl = new Material;
+		m_materials.push_back(mtl);
+
+		return mtl;
+	}
+
+	Material * ResourceManager::GetMaterial(uint32 index)
+	{
+		assert(index < m_materials.size());
+		return m_materials[index];
 	}
 
 }

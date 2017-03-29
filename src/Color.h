@@ -1,6 +1,8 @@
 #ifndef __COLOR_H__
 #define __COLOR_H__
 
+#include <assimp/color4.h>
+
 namespace T3D {
 
 	class Color
@@ -81,6 +83,16 @@ namespace T3D {
 			g = rhs.g;
 			b = rhs.b;
 			a = rhs.a;
+
+			return *this;
+		}
+
+		inline Color & operator = (const aiColor4D & color)
+		{
+			r = color.r;
+			g = color.g;
+			b = color.b;
+			a = color.a;
 
 			return *this;
 		}

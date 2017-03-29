@@ -102,53 +102,74 @@ namespace T3D {
 
 		if (mesh->mMaterialIndex >= 0)
 		{
-			aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
-			processMaterial(material, aiTextureType_DIFFUSE, tmesh); //diffuse贴图 TODO其他贴图
-			processMaterial(material, aiTextureType_SPECULAR, tmesh);
-			processMaterial(material, aiTextureType_AMBIENT, tmesh);
+			processMaterial(scene->mMaterials[mesh->mMaterialIndex], tmesh);
 		}
 	}
 
 	void Model::processNode(aiNode *node, const aiScene *scene)
 	{
+		//处理父节点的mesh
 		for (uint32 i = 0; i < node->mNumMeshes; ++i)
 		{
 			//所有的mesh保存在scene中，子节点只保存其索引
 			aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
+			processMesh(mesh, scene);
 		}
-	}
 
-	void Model::processMaterial(const aiScene *scene)
-	{
-		for (uint32 mIndex = 0; mIndex < scene->mNumMaterials; ++mIndex)
+		//处理子节点
+		for (uint32 index = 0; index < node->mNumChildren; ++index)
 		{
-			aiMaterial *material = scene->mMaterials[mIndex];
-
-			int fill_mode;
-			int ret1, ret2;
-			aiColor4D diffuse;
-			aiColor4D specular;
-			aiColor4D ambient;
-			aiColor4D emission;
-			float shininess, strength;
-			int two_sided;
-			int wireframe;
-			uint32 max;
-			material->
-				if (AI_SUCCESS == aiGetMaterialColor(material, AI_MATKEY_COLOR_DIFFUSE, &diffuse))
-				{
-
-				}
-			material.
-				//加载纹理
-				int index = aiTextureType_NONE;
-			for (++index; index < aiTextureType_UNKNOWN; ++index)
-			{
-				loadTexture(material, (aiTextureType)index);
-			}
+			processNode(node->mChildren[index]; scene);
 		}
 	}
-	void Model::loadTexture(aiMaterial * material, aiTextureType type)
+
+	void Model::processMaterial(const aiMaterial *material, Mesh &mesh)
+	{
+		aiColor4D diffuse;
+		aiColor4D specular;
+		aiColor4D ambient;
+		aiColor4D emission;
+		float shininess;
+		uint32 max;
+
+		auto mtl = ResourceManager::Instance()->AddMaterial();
+
+		if (AI_SUCCESS == aiGetMaterialColor(material, AI_MATKEY_COLOR_DIFFUSE, &diffuse))
+		{
+			mtl->m_diffuse = diffuse;
+		}
+
+		if (AI_SUCCESS == aiGetMaterialColor(material, AI_MATKEY_COLOR_SPECULAR, &specular))
+		{
+			mtl->m_specular = specular;
+		}
+
+		if (AI_SUCCESS == aiGetMaterialColor(material, AI_MATKEY_COLOR_AMBIENT, &ambient))
+		{
+			mtl->m_ambient = ambient;
+		}
+
+		if (AI_SUCCESS == aiGetMaterialColor(material, AI_MATKEY_COLOR_EMISSIVE, &emission))
+		{
+			mtl->m_emission = emission;
+		}
+
+		max = 1;
+		if (AI_SUCCESS == aiGetMaterialFloatArray(material, AI_MATKEY_SHININESS, &shininess, &max))
+		{
+			mtl->m_shininess = shininess;
+		}
+
+		//加载纹理
+		int index = aiTextureType_NONE;
+		for (++index; index < aiTextureType_UNKNOWN; ++index)
+		{
+			loadTexture(material, (aiTextureType)index, mtl);
+		}
+
+		mesh.m_materials = mtl;
+	}
+	void Model::loadTexture(const aiMaterial * material, aiTextureType type, Material *mtl)
 	{
 		for (uint32 i = 0; i < material->GetTextureCount(type); ++i)
 		{
@@ -157,6 +178,7 @@ namespace T3D {
 			{
 				Texture *texture = ResourceManager::Instance()->LoadTexture(path.C_Str());
 				m_textures[path.C_Str()] = texture;
+				mtl->m_textures[type].push_back(texture);
 			}
 		}
 	}

@@ -32,15 +32,14 @@ namespace T3D {
 		void processNode(aiNode *node, const aiScene *scene);
 
 		//转换material为本地数据结构
-		void processMaterial(const aiScene *scene);
+		void processMaterial(const aiMaterial *material, Mesh &mesh);
 
 		void processMesh(aiMesh *mesh, const aiScene *scene);
 
-		void loadTexture(aiMaterial *material, aiTextureType type);
+		void loadTexture(const aiMaterial *material, aiTextureType type, Material *mtl);
 
 	private:
 		std::vector <Mesh> m_meshs; //模型数据 
-		std::map <std::string, Texture*> m_textures; //纹理数据
 		std::string m_name;
 
 		Matrix44 m_worldMatrix;
