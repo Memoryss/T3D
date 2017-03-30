@@ -31,7 +31,6 @@ namespace T3D {
 
 		void processNode(aiNode *node, const aiScene *scene);
 
-		//转换material为本地数据结构
 		void processMaterial(const aiMaterial *material, Mesh &mesh);
 
 		void processMesh(aiMesh *mesh, const aiScene *scene);

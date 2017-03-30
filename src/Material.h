@@ -2,6 +2,7 @@
 #define __MATERIAL_H__
 
 #include <vector>
+#include <map>
 
 #include <assimp/material.h>
 #include <Vector.h>

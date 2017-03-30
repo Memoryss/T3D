@@ -177,7 +177,7 @@ namespace T3D {
 			if (AI_SUCCESS == material->GetTexture(type, i, &path))
 			{
 				Texture *texture = ResourceManager::Instance()->LoadTexture(path.C_Str());
-				m_textures[path.C_Str()] = texture;
+				//m_textures[path.C_Str()] = texture;
 				mtl->m_textures[type].push_back(texture);
 			}
 		}
