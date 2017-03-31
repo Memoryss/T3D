@@ -86,6 +86,7 @@ namespace T3D {
 			tmesh.m_vertics[i].SetData(mesh, i);
 		}
 
+		//face实际上是三角形
 		tmesh.m_numPrimitives = mesh->mNumFaces;
 		tmesh.m_primitives = new Primitive[mesh->mNumFaces];
 		for (uint32 i = 0; i < mesh->mNumFaces; ++i)
@@ -94,6 +95,7 @@ namespace T3D {
 			const auto &face = mesh->mFaces[i];
 			tmesh.m_primitives[i].m_numIndices = face.mNumIndices;
 			tmesh.m_primitives[i].m_indices = new uint32[face.mNumIndices];
+			tmesh.m_primitives[i].m_vertics = tmesh.m_vertics;
 			for (uint32 j = 0; j < face.mNumIndices; ++j)
 			{
 				tmesh.m_primitives[i].m_indices[j] = face.mIndices[j];

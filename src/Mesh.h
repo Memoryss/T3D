@@ -19,7 +19,7 @@ namespace T3D {
 
 	struct Vertex
 	{
-		Vec3 position;
+		Vec4 position;
 		Vec3 normal;
 		Vec2 texcoord; //TODO 暂时支持一个纹理单元把
 		Vec3 tangent;
@@ -69,6 +69,7 @@ namespace T3D {
 
 		uint32 m_numIndices;  //图元索引的个数
 		uint32 *m_indices;    //图元顶点索引
+		Vertex *m_vertics;  //每个primitive里面保存mesh的顶点指针
 	};
 
 	class Mesh

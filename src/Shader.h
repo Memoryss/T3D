@@ -44,8 +44,12 @@ namespace T3D {
 	class Shader
 	{
 	public:
+		Shader(const char *name) : m_name(name) {}
+
 		virtual void ProcessVertex(uint8* vOut, const uint8 vInRef) = 0;
 		virtual void ProcessFragment(uint8 *vOut, const uint8 *vIn) = 0;
+
+		const std::string & GetName() const { return m_name; }
 
 	protected:
 		static inline void calcLights(Vec3 &wPos, Vec3 &norDir, Color &color)

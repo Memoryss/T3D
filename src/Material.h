@@ -7,6 +7,7 @@
 #include <assimp/material.h>
 #include <Vector.h>
 #include "Color.h"
+#include "Shader.h"
 
 
 namespace T3D {
@@ -14,6 +15,7 @@ namespace T3D {
 	class Texture;
 
 	//TODO暂时就是使用这种材质参数
+	//每一个material应该有一个shader 在绘制mesh的时候 向渲染器设置该shader
 	class Material
 	{
 	public:
@@ -29,8 +31,8 @@ namespace T3D {
 
 		std::map<aiTextureType, std::vector<Texture*>> m_textures;
 		//Texture* m_textures[aiTextureType_UNKNOWN - 1] = {0};  //除去第一个和最后一个
+		Shader* m_shader;
 	};
-
 }
 
 #endif

@@ -41,6 +41,29 @@ namespace T3D {
 		return m_path.c_str();
 	}
 
+	bool ResourceManager::AddShader(Shader * sh)
+	{
+		auto iter = std::find_if(m_shaders.begin(), m_shaders.end(), [sh](const Shader * &shader)->bool {return sh->GetName().compare(shader->GetName()); });
+		if (iter != m_shaders.end())
+		{
+			return false;
+		}
+
+		m_shaders.push_back(sh);
+		return true;
+	}
+
+	Shader * ResourceManager::GetShader(const char * name)
+	{
+		auto iter = std::find_if(m_shaders.begin(), m_shaders.end(), [name](const Shader * &shader)->bool {return shader->GetName().compare(name); });
+		if (iter != m_shaders.end())
+		{
+			return *iter;
+		}
+
+		return NULL;
+	}
+
 	std::string ResourceManager::GetAbsolutePath(const char * relative)
 	{
 		std::string path(m_path);

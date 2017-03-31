@@ -9,6 +9,7 @@ namespace T3D {
 		position.x = mesh->mVertices[index].x;
 		position.y = mesh->mVertices[index].y;
 		position.z = mesh->mVertices[index].z;
+		position.w = 1.0f;
 
 		normal.x = mesh->mNormals[index].x;
 		normal.y = mesh->mNormals[index].y;

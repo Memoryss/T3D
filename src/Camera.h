@@ -8,6 +8,8 @@
 
 namespace T3D {
 
+	//使用右手坐标系
+
 	class Camera : public Frustum, public Node
 	{
 	public:
