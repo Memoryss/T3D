@@ -6,6 +6,7 @@
 #include <math.h>
 
 #include <Vector.h>
+#include <TMath.h>
 #include <Matrix.h>
 
 #include "Light.h"
@@ -17,6 +18,15 @@ typedef unsigned int uint32;
 namespace T3D {
 
 	class Texture;
+
+	//shader专用输入数据结构
+	struct VertexP4N3T2
+	{
+		Vec4 pos;
+
+		Vec3 normal;
+		Vec2 texcoord;
+	};
 
 	enum ShaderVec4Constant
 	{
@@ -46,13 +56,16 @@ namespace T3D {
 	public:
 		Shader(const char *name) : m_name(name) {}
 
-		virtual void ProcessVertex(uint8* vOut, const uint8 vInRef) = 0;
-		virtual void ProcessFragment(uint8 *vOut, const uint8 *vIn) = 0;
+		virtual void ProcessVertex(void* vOut, const void *vInRef) = 0;
+		//光栅化插值
+		virtual void ProcessRasterizer(void *vOut, const void *vInRef0, const void *vInRef1, float ratio) = 0;
+		
+		virtual void ProcessFragment(void *vOut, const void *vIn) = 0;
 
 		const std::string & GetName() const { return m_name; }
 
 	protected:
-		static inline void calcLights(Vec3 &wPos, Vec3 &norDir, Color &color)
+		static inline void calcLights(const Vec3 &wPos,const Vec3 &norDir, Color &color)
 		{
 			for (uint32 index = 0; index < g_lights.size(); ++index)
 			{

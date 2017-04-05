@@ -12,7 +12,10 @@ namespace T3D {
 
 		bool DrawPrimitive(const Primitive *pri);
 
-		static void Rasterizer_Triangle(const Primitive *tri);
+		//对三角形进行视锥的裁剪，并提交
+		static void Rasterizer_Triangle_Clip(Primitive *tri);
+
+		static void Rasterizer_Triangle(Primitive *tri);
 
 		static bool DrawLine();
 

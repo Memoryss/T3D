@@ -2,36 +2,44 @@
 
 namespace T3D {
 
-	void FlatShader::ProcessVertex(uint8* vOut, const uint8 vInRef)
+	void FlatShader::ProcessVertex(void *vOut, const void *vInRef)
 	{
-		Vec4 &pos = *(Vec4*)vInRef;
-		Vec3 &nor = *(Vec3*)(sizeof(Vec4) + vInRef);
-		Vec2 &texcoord = *(Vec2*)(sizeof(Vec4) + sizeof(Vec3) + vInRef);
-
+		VertexP4N3T2 *in = (VertexP4N3T2*)vInRef;
+		FlatShader_Output *out = (FlatShader_Output*)vOut;
 		//保存世界坐标系的坐标
-		Vec3 wPos = g_matrixs[SM_World] * pos;
+		out->wPos = g_matrixs[SM_World] * in->pos;
 
 		//转换到投影空间
-		Vec4 *vPost = (Vec4*)vOut;
-		*vPost = g_matrixs[SM_WorldViewProj] * pos;
+		out->pos = g_matrixs[SM_WorldViewProj] * in->pos;
 
 		//法线转换到世界空间
-		Vec3 wNor = g_matrixs[SM_World] * nor;
-		wNor.Normalize();
+		out->normal = g_matrixs[SM_World] * in->normal;
+		out->normal.Normalize();
+		out->texcoord = in->texcoord;
+	}
+
+	void FlatShader::ProcessRasterizer(void * vOut, const void * vInRef0, const void * vInRef1, float ratio)
+	{
+		auto ver0 = (FlatShader_Output*)(vInRef0);
+		auto ver1 = (FlatShader_Output*)(vInRef1);
+
+		auto ver = (FlatShader_Output*)(vOut);
+
+		//获得插值的顶点
+		ver->pos = Math::FastLerp(ver0->pos, ver1->pos, ratio);
+		ver->wPos = Math::FastLerp(ver0->wPos, ver1->wPos, ratio);
+		ver->normal = Math::FastLerp(ver0->normal, ver1->normal, ratio);
+		ver->texcoord = Math::FastLerp(ver0->texcoord, ver1->texcoord, ratio);
+	}
+
+	void FlatShader::ProcessFragment(void *vOut, const void *vIn)
+	{
+		const FlatShader_Output *in = (FlatShader_Output*)vIn;
 
 		//计算光照颜色
 		Color color;
-		calcLights(wPos, wNor, color);
+		calcLights(in->wPos, in->normal, color);
 
-		Color *vColor = (Color*)(vOut + sizeof(Vec4));
-		*vColor = color;
-
-		Vec2 *vTexcoord = (Vec2*)(vOut + sizeof(Vec4) + sizeof(Vec2));
-		*vTexcoord = texcoord;
-	}
-
-	void FlatShader::ProcessFragment(uint8 *vOut, const uint8 *vIn)
-	{
-
+		//out->color = color;
 	}
 }
