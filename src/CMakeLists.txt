@@ -31,6 +31,7 @@ set (PUB_HDR
 	Renderer.h
 	Resource.h
 	ResourceManager.h
+	ViewPort.h
 )
 
 add_library(T3DEngine

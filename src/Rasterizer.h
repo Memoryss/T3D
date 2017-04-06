@@ -47,8 +47,8 @@ namespace T3D {
 
 	private:
 		//光栅化函数
-		static void rasterizer_Top_Triangle(const Primitive *topTri);
-		static void rasterizer_Bottom_Triangle(const Primitive *bottoomTri);
+		static void rasterizer_Top_Triangle(const RastTriangle *topTri);
+		static void rasterizer_Bottom_Triangle(const RastTriangle *bottoomTri);
 
 	private:
 		//Primitive 假定为三角形 后续根据需要处理其他形状的渲染 TODO

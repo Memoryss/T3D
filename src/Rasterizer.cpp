@@ -272,9 +272,96 @@ namespace T3D {
 			vertex.pos.x = (vertex.pos.x * 0.5f + 0.5f) * m_renderer->GetViewPort().width;
 			vertex.pos.y = ( - vertex.pos.y * 0.5f + 0.5f) * m_renderer->GetViewPort().height;
 
-			//排序三角形
+			//排序三角形  0->1->2(y递增)
 			//光栅化分为平顶和平底和不规则三角形
+			if (tri->p[2].pos.y < tri->p[1].pos.y)
+			{
+				tri->p[2].pos.Swap(tri->p[1].pos);
+			}
+
+			if (tri->p[1].pos.y < tri->p[0].pos.y)
+			{
+				tri->p[1].pos.Swap(tri->p[0].pos);
+			}
+
+			if (tri->p[2].pos.y < tri->p[1].pos.y)
+			{
+				tri->p[2].pos.Swap(tri->p[1].pos.y);
+			}
+
+			//平顶三角形  0索引顶点的X/Y坐标是最小的
+			if (tri->p[0].pos.y == tri->p[1].pos.y)
+			{
+				if (tri->p[0].pos.x > tri->p[1].pos.x)
+				{
+					tri->p[0].pos.Swap(tri->p[1].pos);
+				}
+
+				rasterizer_Top_Triangle()
+			}
 		}
+
+	}
+
+	void Rasterizer::rasterizer_Top_Triangle(const RastTriangle * topTri)
+	{
+		float x1 = topTri->p[0].pos.x;
+		float y1 = topTri->p[0].pos.y;
+		float x2 = topTri->p[1].pos.x;
+		float y2 = topTri->p[1].pos.y;
+		float x3 = topTri->p[2].pos.x;
+		float y3 = topTri->p[2].pos.y;
+
+		float dx_left = (x3 - x1) / (y3 - y1);  //左边那条的斜率
+		float dx_right = (x3 - x2) / (y3 - y1); //右边那条的斜率
+
+		float sx1 = x1;  //左边开始的位置
+		float sx2 = x2;  //右边开始的位置
+
+		float min_clip_x = m_renderer->GetViewPort().x;
+		float min_clip_y = m_renderer->GetViewPort().y;
+		float max_clip_x = m_renderer->GetViewPort().x + m_renderer->GetViewPort().width;
+		float max_clip_y = m_renderer->GetViewPort().y + m_renderer->GetViewPort().height;
+
+		float offsety = 0;
+		int iy1 = 0; //整形
+		int iy3 = 0;
+
+		//y裁剪
+		if (y1 < min_clip_y)
+		{
+			sx1 = sx1 + dx_left * (min_clip_x - y1);
+			sx2 = sx2 + dx_right * (min_clip_y - y1);
+
+			y1 = min_clip_x;
+			iy1 = ceil(y1 - 0.5f);
+
+			offsety = iy1 - y1;
+		}
+		else
+		{
+			//左上填充规则
+			iy1 = (int)ceil(y1 - 0.5f);
+
+			offsety = iy1 - y1;
+
+			sx1 = sx1 + dx_left * (iy1 - y1);
+			sx2 = sx2 + dx_right * (iy1 - y1);
+		}
+
+		if (y3 > max_clip_y)
+		{
+			y3 = max_clip_y;
+			iy3 = (int)y3;
+		}
+		else
+		{
+			iy3 = 
+		}
+	}
+
+	void Rasterizer::rasterizer_Bottom_Triangle(const RastTriangle * bottoomTri)
+	{
 
 	}
 
