@@ -2,6 +2,10 @@
 
 #include <assert.h>
 
+#include <TMath.h>
+
+#include "Renderer.h"
+
 namespace T3D {
 
 
@@ -11,8 +15,8 @@ namespace T3D {
 		return false;
 	}
 
-	//调用该函数的时候，顶点已经执行过了透视投影在投影空间
-	void Rasterizer::Rasterizer_Triangle_Clip(Primitive * tri)
+	//调用该函数的时候，顶点已经执行过了透视投影  顶点在投影空间
+	void Rasterizer::Rasterizer_Triangle_Clip(RastTriangle * tri, Shader *shader, float zNear, float zFar)
 	{
 		// 裁剪的区域判断码
 #define CLIP_CODE_MORE_Z 0X0001 //z > z_max
@@ -28,15 +32,15 @@ namespace T3D {
 #define CLIP_CODE_IN_Y 0X004 // y_min < y < y_max
 
 		//先执行透视除法  cvv(-1 ~ 1)
-		for (uint32 index; index < tri->m_numIndices; ++index)
+		for (uint32 index; index < 3; ++index)
 		{
 			//透视除法
-			auto &vertex = tri->m_vertics[tri->m_indices[index]];
-			assert(vertex.position.w != 0);
+			auto &vertex = tri->p[index];
+			assert(vertex.pos.w != 0);
 
-			float w = vertex.position.z;
-			vertex.position = vertex.position * (1 / vertex.position.w);
-			vertex.position.w = vertex.position.w;
+			float w = vertex.pos.z;
+			vertex.pos = vertex.pos * (1 / vertex.pos.w);
+			vertex.pos.w = vertex.pos.w;
 		}
 
 		//cvv裁剪
@@ -44,26 +48,26 @@ namespace T3D {
 		int num_vertexs_in_z; //判断有几个顶点在近平面内
 
 		//裁剪x轴
-		auto &vertex0 = tri->m_vertics[tri->m_indices[0]];
-		if (vertex0.position.x > 1.f)
+		auto &vertex0 = tri->p[0];
+		if (vertex0.pos.x > 1.f)
 			vertex_flag[0] = CLIP_CODE_MORE_X;
-		else if (vertex0.position.x < -1.f)
+		else if (vertex0.pos.x < -1.f)
 			vertex_flag[0] = CLIP_CODE_LESS_X;
 		else
 			vertex_flag[0] = CLIP_CODE_IN_X;
 
-		auto &vertex1 = tri->m_vertics[tri->m_indices[1]];
-		if (vertex1.position.x > 1.f)
+		auto &vertex1 = tri->p[1];
+		if (vertex1.pos.x > 1.f)
 			vertex_flag[1] = CLIP_CODE_MORE_X;
-		else if (vertex1.position.x < -1.f)
+		else if (vertex1.pos.x < -1.f)
 			vertex_flag[1] = CLIP_CODE_LESS_X;
 		else
 			vertex_flag[1] = CLIP_CODE_IN_X;
 
-		auto &vertex2 = tri->m_vertics[tri->m_indices[2]];
-		if (vertex2.position.x > 1.f)
+		auto &vertex2 = tri->p[2];
+		if (vertex2.pos.x > 1.f)
 			vertex_flag[2] = CLIP_CODE_MORE_X;
-		else if (vertex2.position.x < -1.f)
+		else if (vertex2.pos.x < -1.f)
 			vertex_flag[2] = CLIP_CODE_LESS_X;
 		else
 			vertex_flag[2] = CLIP_CODE_IN_X;
@@ -74,26 +78,26 @@ namespace T3D {
 			return;
 
 		//裁剪Y坐标
-		auto &vertex0 = tri->m_vertics[tri->m_indices[0]];
-		if (vertex0.position.y > 1.f)
+		auto &vertex0 = tri->p[0];
+		if (vertex0.pos.y > 1.f)
 			vertex_flag[0] = CLIP_CODE_MORE_Y;
-		else if (vertex0.position.y < -1.f)
+		else if (vertex0.pos.y < -1.f)
 			vertex_flag[0] = CLIP_CODE_LESS_Y;
 		else
 			vertex_flag[0] = CLIP_CODE_IN_Y;
 
-		auto &vertex1 = tri->m_vertics[tri->m_indices[1]];
-		if (vertex1.position.y > 1.f)
+		auto &vertex1 = tri->p[1];
+		if (vertex1.pos.y > 1.f)
 			vertex_flag[1] = CLIP_CODE_MORE_Y;
-		else if (vertex1.position.y < -1.f)
+		else if (vertex1.pos.y < -1.f)
 			vertex_flag[1] = CLIP_CODE_LESS_Y;
 		else
 			vertex_flag[1] = CLIP_CODE_IN_Y;
 
-		auto &vertex2 = tri->m_vertics[tri->m_indices[2]];
-		if (vertex2.position.y > 1.f)
+		auto &vertex2 = tri->p[2];
+		if (vertex2.pos.y > 1.f)
 			vertex_flag[2] = CLIP_CODE_MORE_Y;
-		else if (vertex2.position.y < -1.f)
+		else if (vertex2.pos.y < -1.f)
 			vertex_flag[2] = CLIP_CODE_LESS_Y;
 		else
 			vertex_flag[2] = CLIP_CODE_IN_Y;
@@ -104,10 +108,10 @@ namespace T3D {
 			return;
 
 		//裁剪Z坐标
-		auto &vertex0 = tri->m_vertics[tri->m_indices[0]];
-		if (vertex0.position.z > 1.f)
+		auto &vertex0 = tri->p[0];
+		if (vertex0.pos.z > 1.f)
 			vertex_flag[0] = CLIP_CODE_MORE_Z;
-		else if (vertex0.position.z < -1.f)
+		else if (vertex0.pos.z < -1.f)
 			vertex_flag[0] = CLIP_CODE_LESS_Z;
 		else
 		{
@@ -115,10 +119,10 @@ namespace T3D {
 			vertex_flag[0] = CLIP_CODE_IN_Z;
 		}
 
-		auto &vertex1 = tri->m_vertics[tri->m_indices[1]];
-		if (vertex1.position.z > 1.f)
+		auto &vertex1 = tri->p[1];
+		if (vertex1.pos.z > 1.f)
 			vertex_flag[1] = CLIP_CODE_MORE_Z;
-		else if (vertex1.position.z < -1.f)
+		else if (vertex1.pos.z < -1.f)
 			vertex_flag[1] = CLIP_CODE_LESS_Z;
 		else
 		{
@@ -126,10 +130,10 @@ namespace T3D {
 			vertex_flag[1] = CLIP_CODE_IN_Z;
 		}
 
-		auto &vertex2 = tri->m_vertics[tri->m_indices[2]];
-		if (vertex2.position.z > 1.f)
+		auto &vertex2 = tri->p[2];
+		if (vertex2.pos.z > 1.f)
 			vertex_flag[2] = CLIP_CODE_MORE_Z;
-		else if (vertex2.position.z < -1.f)
+		else if (vertex2.pos.z < -1.f)
 			vertex_flag[2] = CLIP_CODE_LESS_Z;
 		else
 		{
@@ -152,7 +156,7 @@ namespace T3D {
 		else if ((vertex_flag[0] | vertex_flag[1] | vertex_flag[2]) & CLIP_CODE_LESS_X)
 		{
 			int v0, v1, v2;
-			//如果只有一个在近平面内，直接裁减
+			//如果只有一个在近平面内，直接裁减  裁剪后只会有一个三角形
 			if (num_vertexs_in_z == 1)
 			{
 				//1.先简单排序，把视锥里面的顶点排到第一个
@@ -172,25 +176,105 @@ namespace T3D {
 				}
 
 				// 2.裁剪
-				float ratio1 = ()
-			}
+				auto p0 = tri->p[v0];
+				auto p1 = tri->p[v1];
+				auto p2 = tri->p[v2];
 
+				// FIXME DIVIDE 0
+				assert(abs(p0.pos.w - p1.pos.w) > FLOAT_PRECISION);
+				assert(abs(p0.pos.w - p2.pos.w) > FLOAT_PRECISION);
+
+				float ratio1 = (p0.pos.w - zNear) / (p0.pos.w - p1.pos.w);
+				float ratio2 = (p0.pos.w - zNear) / (p0.pos.w - p2.pos.w);
+				
+				//获得裁剪后的顶点
+				shader->ProcessRasterizer(&p1, &tri->p[v0], &tri->p[v1], ratio1);
+				shader->ProcessRasterizer(&p2, &tri->p[v0], &tri->p[v2], ratio2);
+				
+				tri->p[v1] = p1;
+				tri->p[v2] = p2;
+
+				//裁剪完毕，提交渲染 TODO
+				Rasterizer_Triangle(tri);
+			}
+			else if (num_vertexs_in_z == 2)  //如果两个顶点在近裁减面上 则裁剪后会有两个三角形
+			{
+				//1.找出不在视锥体内部的顶点 重新排序
+				if (vertex_flag[0] == CLIP_CODE_LESS_Z)
+				{
+					v0 = 0; v1 = 1; v2 = 2;
+				}
+				else if (vertex_flag[1] == CLIP_CODE_LESS_Z)
+				{
+					v0 = 1; v1 = 2; v2 = 0;
+				}
+				else
+				{
+					v0 = 2; v1 = 0; v2 = 1;
+				}
+
+				//2.裁剪
+				auto p0 = tri->p[v0];
+				auto p1 = tri->p[v1];
+				auto p2 = tri->p[v2];
+
+				auto p3 = p1;
+				auto p4 = p2;
+
+				assert(p1.pos.w - p0.pos.w > FLOAT_PRECISION);
+				assert(p2.pos.w - p0.pos.w > FLOAT_PRECISION);
+
+				float ratio1 = (zNear - p0.pos.w) / (p1.pos.w - p0.pos.w);
+				float ratio2 = (zNear - p0.pos.w) / (p2.pos.w - p0.pos.w);
+
+				shader->ProcessRasterizer(&p3, &tri->p[v0], &tri->p[v1], ratio1);
+				shader->ProcessRasterizer(&p4, &tri->p[v0], &tri->p[v2], ratio2);
+
+				//3.构造新的三角形
+				RastTriangle tri1 = *tri;
+				RastTriangle tri2 = *tri;
+
+				tri1.p[v0] = p3;
+
+				tri2.p[v0] = p4;
+				tri2.p[v1] = p3;
+
+				//提交分割后的三角形
+				Rasterizer_Triangle(&tri1);
+				Rasterizer_Triangle(&tri2);
+			}
 		}
 	}
 
-	void Rasterizer::Rasterizer_Triangle(Primitive * tri)
+	//已经进行过透视除法
+	void Rasterizer::Rasterizer_Triangle(RastTriangle * tri)
 	{
-		auto &vertex0 = tri->m_vertics[tri->m_indices[0]];
-		auto &vertex1 = tri->m_vertics[tri->m_indices[1]];
-		auto &vertex2 = tri->m_vertics[tri->m_indices[2]];
-		assert(vertex0.position.w != 0);
-		assert(vertex1.position.w != 0);
-		assert(vertex2.position.w != 0);
+		//1.背面剔除
+		assert(tri->p[0].pos.w > FLOAT_PRECISION);
+		assert(tri->p[1].pos.w > FLOAT_PRECISION);
+		assert(tri->p[2].pos.w > FLOAT_PRECISION);
 
-		//透视除法 转换到cvv中
-		Vec3 side1 = vertex0.position.XYZ / vertex0.position.w - vertex1.position.XYZ / vertex1.position.w;
-		Vec3 side2 = vertex1.position.XYZ / vertex1.position.w - vertex2.position.XYZ / vertex2.position.w;
+		//计算法线
+		Vec3 v0v1 = tri->p[1].pos.XYZ - tri->p[0].pos.XYZ;
+		Vec3 v1v2 = tri->p[2].pos.XYZ - tri->p[1].pos.XYZ;
+		v0v1.z = 0.f;  //只计算方向 与Z坐标无关，可置为0
+		v1v2.z = 0.f;
+		Vec3 nor = v0v1.Cross(v1v2);
+		//法线朝向为-z 表示为背面，剔除
+		if (nor.z < 0) return;
 
+		//TODO 可以有个pitch shader
+
+		//此时顶点在cvv中，需要转化到屏幕空间
+		for (uint32 index = 0; index < 3; ++index)
+		{
+			auto &vertex = tri->p[index];
+			vertex.pos.x = (vertex.pos.x * 0.5f + 0.5f) * m_renderer->GetViewPort().width;
+			vertex.pos.y = ( - vertex.pos.y * 0.5f + 0.5f) * m_renderer->GetViewPort().height;
+
+			//排序三角形
+			//光栅化分为平顶和平底和不规则三角形
+		}
 
 	}
 
