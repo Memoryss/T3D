@@ -1,7 +1,9 @@
 #include "Renderer.h"
 
 namespace T3D {
-
+	Renderer::Renderer()
+	{
+	}
 	const ViewPort & Renderer::AddViewPort(uint32 x, uint32 y, uint32 width, uint32 hegiht, const std::string & name)
 	{
 		auto iter = m_viewports.find(name);
