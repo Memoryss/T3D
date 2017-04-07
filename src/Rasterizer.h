@@ -31,6 +31,8 @@ namespace T3D {
 	{
 	public:
 
+		bool Init()
+
 		bool DrawPrimitive(const Primitive *pri);
 
 		//对三角形进行视锥的裁剪，并提交
@@ -40,11 +42,11 @@ namespace T3D {
 
 		static void Rasterizer_Triangle(RastTriangle *tri);
 
-		static bool DrawLine();
+		static bool Rasterizer_Line_Cliped(uint32 line, float lstart, float lend, float lclipStart, float lclipEnd);
 
 	public:
 		static Renderer *m_renderer;
-
+		static float * m_zbuffer; //深度缓存
 	private:
 		//光栅化函数
 		static void rasterizer_Top_Triangle(const RastTriangle *topTri);

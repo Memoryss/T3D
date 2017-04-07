@@ -303,6 +303,13 @@ namespace T3D {
 
 	}
 
+	bool Rasterizer::Rasterizer_Line_Cliped(uint32 line, float lstart, float lend, float lclipStart, float lclipEnd)
+	{
+
+
+		return false;
+	}
+
 	void Rasterizer::rasterizer_Top_Triangle(const RastTriangle * topTri)
 	{
 		float x1 = topTri->p[0].pos.x;
@@ -352,11 +359,29 @@ namespace T3D {
 		if (y3 > max_clip_y)
 		{
 			y3 = max_clip_y;
-			iy3 = (int)y3;
+			if (y3 - 0.5f > int(y3))
+				iy3 = (int)ceil(y3);
+			else
+				iy3 = int(y3);
 		}
 		else
 		{
-			iy3 = 
+			if (y3 - 0.5f > int(y3))
+				iy3 = (int)ceil(y3);
+			else
+				iy3 = int(y3);
+		}
+
+		//斜率
+		float k_right = 1 / dx_right;
+		if (x1 >= min_clip_x && x1 <= max_clip_x && x2 >= min_clip_x && x2 <= max_clip_x && x3 >= min_clip_x && x3 <= max_clip_x)
+		{
+			//扫描线
+			for (uint32 loop_y = iy1; loop_y < iy3; ++loop_y)
+			{
+				//斜率大于1
+				if (k_right > 1.0f)
+			}
 		}
 	}
 
