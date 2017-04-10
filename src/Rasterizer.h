@@ -31,7 +31,8 @@ namespace T3D {
 	{
 	public:
 
-		bool Init()
+		static bool Init(Renderer *renderer);
+		static void Destory();
 
 		bool DrawPrimitive(const Primitive *pri);
 
@@ -45,8 +46,8 @@ namespace T3D {
 		static bool Rasterizer_Line_Cliped(uint32 line, float lstart, float lend, float lclipStart, float lclipEnd);
 
 	public:
-		static Renderer *m_renderer;
-		static float * m_zbuffer; //深度缓存
+		static Renderer *s_renderer;
+		static float * s_zbuffer; //深度缓存
 	private:
 		//光栅化函数
 		static void rasterizer_Top_Triangle(const RastTriangle *topTri);

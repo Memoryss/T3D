@@ -8,7 +8,27 @@
 
 namespace T3D {
 
+	Renderer * Rasterizer::s_renderer = NULL;
+	float * Rasterizer::s_zbuffer = NULL;
 
+	bool Rasterizer::Init(Renderer *renderer)
+	{
+		s_renderer = renderer;
+		if (s_zbuffer == NULL)
+		{
+			s_zbuffer = (float *)malloc(sizeof(float) * renderer->GetViewPort().width * renderer->GetViewPort().height);
+		}
+
+		return true;
+	}
+
+	void Rasterizer::Destory()
+	{
+		if (s_zbuffer == NULL)
+		{
+			delete s_zbuffer;
+		}
+	}
 
 	bool Rasterizer::DrawPrimitive(const Primitive * pri)
 	{
@@ -307,7 +327,7 @@ namespace T3D {
 	{
 
 
-		return false;
+		return true;
 	}
 
 	void Rasterizer::rasterizer_Top_Triangle(const RastTriangle * topTri)
@@ -325,10 +345,10 @@ namespace T3D {
 		float sx1 = x1;  //左边开始的位置
 		float sx2 = x2;  //右边开始的位置
 
-		float min_clip_x = m_renderer->GetViewPort().x;
-		float min_clip_y = m_renderer->GetViewPort().y;
-		float max_clip_x = m_renderer->GetViewPort().x + m_renderer->GetViewPort().width;
-		float max_clip_y = m_renderer->GetViewPort().y + m_renderer->GetViewPort().height;
+		float min_clip_x = s_renderer->GetViewPort().x;
+		float min_clip_y = s_renderer->GetViewPort().y;
+		float max_clip_x = s_renderer->GetViewPort().x + m_renderer->GetViewPort().width;
+		float max_clip_y = s_renderer->GetViewPort().y + m_renderer->GetViewPort().height;
 
 		float offsety = 0;
 		int iy1 = 0; //整形
@@ -379,6 +399,7 @@ namespace T3D {
 			//扫描线
 			for (uint32 loop_y = iy1; loop_y < iy3; ++loop_y)
 			{
+				float ratio = 1.0f
 				//斜率大于1
 				if (k_right > 1.0f)
 			}
